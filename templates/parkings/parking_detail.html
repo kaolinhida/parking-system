@@ -22,9 +22,63 @@
                 </p>
             {% endif %}
 
-            <p class="small text-muted">
-                Поточний стан місць станом на {{ now|date:"d.m.Y H:i" }}
-            </p>
+            {% if search_performed %}
+                <p class="small text-muted">
+                    Доступність місць на період:
+                    {{ selected_start|date:"d.m.Y H:i" }} —
+                    {{ selected_end|date:"d.m.Y H:i" }}
+                </p>
+            {% else %}
+                <p class="small text-muted">
+                    Поточний стан місць станом на {{ now|date:"d.m.Y H:i" }}
+                </p>
+            {% endif %}
+        </div>
+
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+                <h5 class="fw-bold mb-3">Пошук доступних місць</h5>
+
+                <form method="get" class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label">{{ form.date.label }}</label>
+                        {{ form.date }}
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">{{ form.start_time.label }}</label>
+                        {{ form.start_time }}
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">{{ form.end_time.label }}</label>
+                        {{ form.end_time }}
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">{{ form.space_type.label }}</label>
+                        {{ form.space_type }}
+                    </div>
+
+                    {% if form.non_field_errors %}
+                        <div class="col-12">
+                            <div class="alert alert-danger mb-0">
+                                {{ form.non_field_errors }}
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary">
+                            Показати доступні місця
+                        </button>
+
+                        <a href="{% url 'parkings:parking_detail' parking.id %}" class="btn btn-outline-secondary">
+                            Скинути фільтр
+                        </a>
+                    </div>
+                </form>
+            </div>
         </div>
 
         <div class="mb-4">
@@ -75,6 +129,14 @@
                                                 {{ space.display_status_label }}
                                             </span>
                                         </div>
+
+                                        {% if search_performed and space.display_status == 'available' and space.tariff %}
+                                            <div class="mt-2">
+                                                <a href="#" class="btn btn-sm btn-outline-success">
+                                                    Забронювати
+                                                </a>
+                                            </div>
+                                        {% endif %}
                                     </div>
                             {% endfor %}
                         </div>
@@ -83,7 +145,7 @@
             </div>
         {% else %}
             <div class="alert alert-info">
-                Для цієї парковки ще не додано паркомісця.
+                Для вибраних параметрів немає паркомісць.
             </div>
         {% endif %}
     </div>
@@ -91,8 +153,8 @@
 
 <style>
     .parking-space-card {
-        width: 140px;
-        min-height: 120px;
+        width: 150px;
+        min-height: 145px;
         border-radius: 12px;
         padding: 12px;
         text-align: center;

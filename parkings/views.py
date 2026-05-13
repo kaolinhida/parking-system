@@ -1,8 +1,11 @@
+from datetime import datetime
+
 from django.db.models import Count
 from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
 
 from reservations.models import Reservation
+from .forms import ParkingAvailabilityForm
 from .models import ParkingLot, Tariff
 
 
@@ -23,13 +26,34 @@ def parking_detail(request, parking_id):
     parking = get_object_or_404(ParkingLot, id=parking_id, is_active=True)
 
     now = timezone.now()
+    form = ParkingAvailabilityForm(request.GET or None)
+
+    search_performed = False
+    selected_start = now
+    selected_end = now
+    selected_space_type = None
+
+    if form.is_valid():
+        search_performed = True
+
+        selected_date = form.cleaned_data['date']
+        start_time = form.cleaned_data['start_time']
+        end_time = form.cleaned_data['end_time']
+        selected_space_type = form.cleaned_data.get('space_type')
+
+        selected_start = timezone.make_aware(
+            datetime.combine(selected_date, start_time)
+        )
+        selected_end = timezone.make_aware(
+            datetime.combine(selected_date, end_time)
+        )
 
     occupied_space_ids = set(
         Reservation.objects.filter(
             parking_space__parking_lot=parking,
             status=Reservation.STATUS_ACTIVE,
-            start_time__lte=now,
-            end_time__gt=now,
+            start_time__lt=selected_end,
+            end_time__gt=selected_start,
         ).values_list('parking_space_id', flat=True)
     )
 
@@ -48,6 +72,9 @@ def parking_detail(request, parking_id):
         .select_related('space_type')
         .order_by('row', 'column')
     )
+
+    if selected_space_type:
+        spaces = spaces.filter(space_type=selected_space_type)
 
     rows = {}
 
@@ -78,4 +105,9 @@ def parking_detail(request, parking_id):
         'parking': parking,
         'parking_rows': parking_rows,
         'now': now,
+        'form': form,
+        'search_performed': search_performed,
+        'selected_start': selected_start,
+        'selected_end': selected_end,
+        'selected_space_type': selected_space_type,
     })
