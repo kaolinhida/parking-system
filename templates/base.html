@@ -14,7 +14,7 @@
         <a class="navbar-brand fw-bold" href="{% url 'core:home' %}">Parking System</a>
 
         <div class="navbar-nav ms-auto">
-            <a class="nav-link" href="#">Парковки</a>
+            <a class="nav-link" href="{% url 'parkings:parking_list' %}">Парковки</a>
 
             {% if user.is_authenticated %}
                 <a class="nav-link" href="#">Мій кабінет</a>

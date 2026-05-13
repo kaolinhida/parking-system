@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ parking.name }} | Parking System{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="mb-4">
+            <a href="{% url 'parkings:parking_list' %}" class="text-decoration-none">
+                ← Назад до списку парковок
+            </a>
+
+            <h1 class="fw-bold mt-3">{{ parking.name }}</h1>
+
+            <p class="text-muted mb-1">
+                {{ parking.address }}
+            </p>
+
+            {% if parking.description %}
+                <p class="mb-3">
+                    {{ parking.description }}
+                </p>
+            {% endif %}
+
+            <p class="small text-muted">
+                Поточний стан місць станом на {{ now|date:"d.m.Y H:i" }}
+            </p>
+        </div>
+
+        <div class="mb-4">
+            <span class="badge bg-success me-2">Вільне</span>
+            <span class="badge bg-secondary me-2">Зайняте</span>
+            <span class="badge bg-danger me-2">Неактивне</span>
+        </div>
+
+        {% if parking_rows %}
+            <div class="parking-grid">
+                {% for row in parking_rows %}
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="fw-bold me-3" style="width: 60px;">
+                            Ряд {{ row.row_number }}
+                        </div>
+
+                        <div class="d-flex flex-wrap gap-3">
+                            {% for space in row.spaces %}
+                                {% if space.display_status == 'available' %}
+                                    <div class="parking-space-card border border-success bg-success-subtle">
+                                {% elif space.display_status == 'occupied' %}
+                                    <div class="parking-space-card border border-secondary bg-secondary-subtle">
+                                {% else %}
+                                    <div class="parking-space-card border border-danger bg-danger-subtle">
+                                {% endif %}
+                                        <div class="fw-bold fs-5">{{ space.number }}</div>
+
+                                        <div class="small">
+                                            {{ space.space_type.name }}
+                                        </div>
+
+                                        {% if space.tariff %}
+                                            <div class="small">
+                                                {{ space.tariff.price_per_hour }} грн/год
+                                            </div>
+                                        {% else %}
+                                            <div class="small text-muted">
+                                                Тариф не задано
+                                            </div>
+                                        {% endif %}
+
+                                        <div class="mt-2">
+                                            <span class="badge 
+                                                {% if space.display_status == 'available' %}bg-success
+                                                {% elif space.display_status == 'occupied' %}bg-secondary
+                                                {% else %}bg-danger{% endif %}
+                                            ">
+                                                {{ space.display_status_label }}
+                                            </span>
+                                        </div>
+                                    </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                Для цієї парковки ще не додано паркомісця.
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+<style>
+    .parking-space-card {
+        width: 140px;
+        min-height: 120px;
+        border-radius: 12px;
+        padding: 12px;
+        text-align: center;
+    }
+</style>
+{% endblock %}

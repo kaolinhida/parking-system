@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}Парковки | Parking System{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="mb-4">
+            <h1 class="fw-bold">Доступні парковки</h1>
+            <p class="text-muted">
+                Оберіть парковку, щоб переглянути схему паркомісць та поточний стан місць.
+            </p>
+        </div>
+
+        {% if parkings %}
+            <div class="row g-4">
+                {% for parking in parkings %}
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card h-100 shadow-sm border-0">
+                            <div class="card-body">
+                                <h5 class="card-title fw-bold">{{ parking.name }}</h5>
+
+                                <p class="card-text text-muted mb-2">
+                                    {{ parking.address }}
+                                </p>
+
+                                {% if parking.description %}
+                                    <p class="card-text">
+                                        {{ parking.description }}
+                                    </p>
+                                {% endif %}
+
+                                <p class="small text-muted mb-3">
+                                    Кількість місць: {{ parking.spaces_count }}
+                                </p>
+
+                                <a href="{% url 'parkings:parking_detail' parking.id %}" class="btn btn-primary">
+                                    Переглянути парковку
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                Наразі активних парковок немає.
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
