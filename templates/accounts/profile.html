@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+
+{% block title %}Мій кабінет | Parking System{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="mb-4">
+            <h1 class="fw-bold">Мій кабінет</h1>
+            <p class="text-muted mb-0">
+                Тут відображається інформація про користувача та його бронювання.
+            </p>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <h5 class="fw-bold mb-3">Дані користувача</h5>
+
+                        <p class="mb-2">
+                            <strong>Користувач:</strong> {{ user.username }}
+                        </p>
+
+                        <p class="mb-0">
+                            <strong>Email:</strong>
+                            {% if user.email %}
+                                {{ user.email }}
+                            {% else %}
+                                не вказано
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-8">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body text-center">
+                                <div class="h2 fw-bold text-primary">{{ active_count }}</div>
+                                <div class="text-muted">Активні</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body text-center">
+                                <div class="h2 fw-bold text-success">{{ completed_count }}</div>
+                                <div class="text-muted">Завершені</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body text-center">
+                                <div class="h2 fw-bold text-danger">{{ cancelled_count }}</div>
+                                <div class="text-muted">Скасовані</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="h4 fw-bold mb-0">Мої бронювання</h2>
+
+            <a href="{% url 'parkings:parking_list' %}" class="btn btn-primary">
+                Знайти паркомісце
+            </a>
+        </div>
+
+        {% if reservations %}
+            <div class="card border-0 shadow-sm">
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Парковка</th>
+                                <th>Місце</th>
+                                <th>Авто</th>
+                                <th>Час</th>
+                                <th>Статус</th>
+                                <th>Вартість</th>
+                                <th>Дія</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for reservation in reservations %}
+                                <tr>
+                                    <td>{{ reservation.parking_space.parking_lot.name }}</td>
+                                    <td>{{ reservation.parking_space.number }}</td>
+                                    <td>{{ reservation.car_number }}</td>
+                                    <td>
+                                        {{ reservation.start_time|date:"d.m.Y H:i" }}
+                                        —
+                                        {{ reservation.end_time|date:"d.m.Y H:i" }}
+                                    </td>
+                                    <td>
+                                        {% if reservation.status == 'active' %}
+                                            <span class="badge bg-primary">Активне</span>
+                                        {% elif reservation.status == 'cancelled' %}
+                                            <span class="badge bg-danger">Скасоване</span>
+                                        {% else %}
+                                            <span class="badge bg-success">Завершене</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ reservation.total_price }} грн</td>
+                                    <td>
+                                        {% if reservation.status == 'active' %}
+                                            <button class="btn btn-sm btn-outline-danger" disabled>
+                                                Скасувати
+                                            </button>
+                                        {% else %}
+                                            —
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                У вас ще немає бронювань.
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

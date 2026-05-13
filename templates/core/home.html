@@ -20,9 +20,9 @@
                     <a href="{% url 'parkings:parking_list' %}" class="btn btn-primary btn-lg">Переглянути парковки</a>
 
                     {% if user.is_authenticated %}
-                        <a href="#" class="btn btn-outline-dark btn-lg">Мій кабінет</a>
+                        <a href="{% url 'accounts:profile' %}" class="btn btn-outline-dark btn-lg">Мій кабінет</a>
                     {% else %}
-                        <a href="#" class="btn btn-outline-dark btn-lg">Зареєструватися</a>
+                        <a href="{% url 'accounts:register' %}" class="btn btn-outline-dark btn-lg">Зареєструватися</a>
                     {% endif %}
                 </div>
             </div>
