@@ -2,6 +2,7 @@ import math
 from datetime import datetime
 from decimal import Decimal
 
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404, redirect, render
@@ -96,3 +97,24 @@ def create_reservation(request, space_id):
         'duration_hours': duration_hours,
         'total_price': total_price,
     })
+
+@login_required
+def cancel_reservation(request, reservation_id):
+    reservation = get_object_or_404(
+        Reservation,
+        id=reservation_id,
+        user=request.user
+    )
+
+    if request.method != 'POST':
+        return redirect('accounts:profile')
+
+    if reservation.status != Reservation.STATUS_ACTIVE:
+        messages.error(request, 'Можна скасувати тільки активне бронювання.')
+        return redirect('accounts:profile')
+
+    reservation.status = Reservation.STATUS_CANCELLED
+    reservation.save()
+
+    messages.success(request, 'Бронювання успішно скасовано.')
+    return redirect('accounts:profile')

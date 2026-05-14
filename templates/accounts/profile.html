@@ -113,9 +113,12 @@
                                     <td>{{ reservation.total_price }} грн</td>
                                     <td>
                                         {% if reservation.status == 'active' %}
-                                            <button class="btn btn-sm btn-outline-danger" disabled>
+                                            <form method="post" action="{% url 'reservations:cancel_reservation' reservation.id %}">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">
                                                 Скасувати
-                                            </button>
+                                                </button>
+                                            </form>
                                         {% else %}
                                             —
                                         {% endif %}
