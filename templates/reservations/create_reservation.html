@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+
+{% block title %}Бронювання місця | Parking System{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="mb-4">
+            <a href="{% url 'parkings:parking_detail' parking_space.parking_lot.id %}" class="text-decoration-none">
+                ← Назад до парковки
+            </a>
+
+            <h1 class="fw-bold mt-3">Бронювання паркомісця {{ parking_space.number }}</h1>
+
+            <p class="text-muted mb-0">
+                Перевірте дані бронювання та введіть номер автомобіля.
+            </p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-7">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-3">Дані бронювання</h5>
+
+                        <div class="table-responsive">
+                            <table class="table">
+                                <tbody>
+                                    <tr>
+                                        <th>Парковка</th>
+                                        <td>{{ parking_space.parking_lot.name }}</td>
+                                    </tr>
+
+                                    <tr>
+                                        <th>Адреса</th>
+                                        <td>{{ parking_space.parking_lot.address }}</td>
+                                    </tr>
+
+                                    <tr>
+                                        <th>Паркомісце</th>
+                                        <td>{{ parking_space.number }}</td>
+                                    </tr>
+
+                                    <tr>
+                                        <th>Тип місця</th>
+                                        <td>{{ parking_space.space_type.name }}</td>
+                                    </tr>
+
+                                    <tr>
+                                        <th>Час початку</th>
+                                        <td>{{ start_datetime|date:"d.m.Y H:i" }}</td>
+                                    </tr>
+
+                                    <tr>
+                                        <th>Час завершення</th>
+                                        <td>{{ end_datetime|date:"d.m.Y H:i" }}</td>
+                                    </tr>
+
+                                    <tr>
+                                        <th>Тривалість</th>
+                                        <td>{{ duration_hours }} год.</td>
+                                    </tr>
+
+                                    <tr>
+                                        <th>Тариф</th>
+                                        <td>{{ tariff.price_per_hour }} грн/год</td>
+                                    </tr>
+
+                                    <tr>
+                                        <th>Загальна вартість</th>
+                                        <td>
+                                            <strong>{{ total_price }} грн</strong>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <form method="post" class="mt-4">
+                            {% csrf_token %}
+
+                            {% if form.non_field_errors %}
+                                <div class="alert alert-danger">
+                                    {{ form.non_field_errors }}
+                                </div>
+                            {% endif %}
+
+                            <div class="mb-3">
+                                <label class="form-label">{{ form.car_number.label }}</label>
+                                {{ form.car_number }}
+
+                                {% if form.car_number.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {{ form.car_number.errors }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <button type="submit" class="btn btn-success">
+                                Підтвердити бронювання
+                            </button>
+
+                            <a href="{% url 'parkings:parking_detail' parking_space.parking_lot.id %}" class="btn btn-outline-secondary">
+                                Скасувати
+                            </a>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-5">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-3">Примітка</h5>
+
+                        <p class="text-muted mb-0">
+                            Онлайн-оплата в системі не використовується. Вартість бронювання
+                            розраховується автоматично на основі тарифу та тривалості паркування.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

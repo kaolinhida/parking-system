@@ -132,9 +132,9 @@
 
                                         {% if search_performed and space.display_status == 'available' and space.tariff %}
                                             <div class="mt-2">
-                                                <a href="#" class="btn btn-sm btn-outline-success">
-                                                    Забронювати
-                                                </a>
+                                                <a href="{% url 'reservations:create_reservation' space.id %}?{{ request.GET.urlencode }}" class="btn btn-sm btn-outline-success">
+    Забронювати
+</a>
                                             </div>
                                         {% endif %}
                                     </div>
