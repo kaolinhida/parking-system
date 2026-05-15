@@ -1,12 +1,24 @@
 from django import forms
 
+from vehicles.models import Vehicle
+
 
 class ReservationForm(forms.Form):
-    car_number = forms.CharField(
-        label='Номер автомобіля',
-        max_length=20,
-        widget=forms.TextInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'Наприклад: BK1234AB',
+    vehicle = forms.ModelChoiceField(
+        label='Автомобіль',
+        queryset=Vehicle.objects.none(),
+        empty_label='Оберіть автомобіль',
+        widget=forms.Select(attrs={
+            'class': 'form-select',
         })
     )
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+
+        if user:
+            self.fields['vehicle'].queryset = Vehicle.objects.filter(
+                user=user,
+                is_active=True
+            ).order_by('brand', 'model')

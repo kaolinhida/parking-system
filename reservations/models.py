@@ -31,6 +31,14 @@ class Reservation(models.Model):
         related_name='reservations',
         verbose_name='Паркомісце'
     )
+    vehicle = models.ForeignKey(
+    'vehicles.Vehicle',
+    on_delete=models.SET_NULL,
+    null=True,
+    blank=True,
+    related_name='reservations',
+    verbose_name='Автомобіль'
+    )
     tariff = models.ForeignKey(
         Tariff,
         on_delete=models.PROTECT,

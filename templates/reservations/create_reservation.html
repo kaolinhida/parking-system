@@ -13,7 +13,7 @@
             <h1 class="fw-bold mt-3">Бронювання паркомісця {{ parking_space.number }}</h1>
 
             <p class="text-muted mb-0">
-                Перевірте дані бронювання та введіть номер автомобіля.
+                Перевірте дані бронювання та виберіть автомобіль із вашого гаража.
             </p>
         </div>
 
@@ -85,20 +85,31 @@
                                 </div>
                             {% endif %}
 
-                            <div class="mb-3">
-                                <label class="form-label">{{ form.car_number.label }}</label>
-                                {{ form.car_number }}
+                            {% if has_vehicles %}
+                                <div class="mb-3">
+                                    <label class="form-label">{{ form.vehicle.label }}</label>
+                                    {{ form.vehicle }}
 
-                                {% if form.car_number.errors %}
-                                    <div class="text-danger small mt-1">
-                                        {{ form.car_number.errors }}
-                                    </div>
-                                {% endif %}
-                            </div>
+                                    {% if form.vehicle.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {{ form.vehicle.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
 
-                            <button type="submit" class="btn btn-success">
-                                Підтвердити бронювання
-                            </button>
+                                <button type="submit" class="btn btn-success">
+                                    Підтвердити бронювання
+                                </button>
+                            {% else %}
+                                <div class="alert alert-warning">
+                                    Щоб створити бронювання, спочатку додайте автомобіль у розділі
+                                    <strong>“Мій гараж”</strong>.
+                                </div>
+
+                                <a href="{% url 'vehicles:vehicle_add' %}" class="btn btn-primary">
+                                    Додати автомобіль
+                                </a>
+                            {% endif %}
 
                             <a href="{% url 'parkings:parking_detail' parking_space.parking_lot.id %}" class="btn btn-outline-secondary">
                                 Скасувати

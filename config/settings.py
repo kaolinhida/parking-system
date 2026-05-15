@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'reservations',
     'dashboard',
     'reports',
+    'vehicles',
 ]
 
 MIDDLEWARE = [
@@ -130,3 +131,6 @@ STATICFILES_DIRS = [
 LOGIN_URL = 'accounts:login'
 LOGIN_REDIRECT_URL = 'accounts:profile'
 LOGOUT_REDIRECT_URL = 'core:home'
+
+MEDIA_URL = 'media/'
+MEDIA_ROOT = BASE_DIR / 'media'

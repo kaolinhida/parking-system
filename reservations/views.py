@@ -63,15 +63,20 @@ def create_reservation(request, space_id):
     price_per_hour = tariff.price_per_hour
     total_price = Decimal(duration_hours) * price_per_hour
 
+    user_vehicles = request.user.vehicles.filter(is_active=True)
+
     if request.method == 'POST':
-        form = ReservationForm(request.POST)
+        form = ReservationForm(request.POST, user=request.user)
 
         if form.is_valid():
+            selected_vehicle = form.cleaned_data['vehicle']
+
             reservation = Reservation(
                 user=request.user,
                 parking_space=parking_space,
+                vehicle=selected_vehicle,
                 tariff=tariff,
-                car_number=form.cleaned_data['car_number'].upper(),
+                car_number=selected_vehicle.license_plate,
                 start_time=start_datetime,
                 end_time=end_datetime,
                 price_per_hour=price_per_hour,
@@ -82,11 +87,12 @@ def create_reservation(request, space_id):
             try:
                 reservation.full_clean()
                 reservation.save()
+                messages.success(request, 'Бронювання успішно створено.')
                 return redirect('accounts:profile')
             except ValidationError as error:
                 form.add_error(None, error)
     else:
-        form = ReservationForm()
+        form = ReservationForm(user=request.user)
 
     return render(request, 'reservations/create_reservation.html', {
         'form': form,
@@ -96,7 +102,9 @@ def create_reservation(request, space_id):
         'end_datetime': end_datetime,
         'duration_hours': duration_hours,
         'total_price': total_price,
+        'has_vehicles': user_vehicles.exists(),
     })
+
 
 @login_required
 def cancel_reservation(request, reservation_id):

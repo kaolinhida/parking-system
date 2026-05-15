@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block title %}Додати авто | Parking System{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-7">
+                <div class="mb-4">
+                    <a href="{% url 'vehicles:vehicle_list' %}" class="text-decoration-none">
+                        ← Назад до гаража
+                    </a>
+
+                    <h1 class="fw-bold mt-3">Додати автомобіль</h1>
+                    <p class="text-muted mb-0">
+                        Заповніть дані автомобіля, щоб використовувати його під час бронювання.
+                    </p>
+                </div>
+
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <form method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+
+                            {% if form.non_field_errors %}
+                                <div class="alert alert-danger">
+                                    {{ form.non_field_errors }}
+                                </div>
+                            {% endif %}
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">{{ form.brand.label }}</label>
+                                    {{ form.brand }}
+                                    <div class="text-danger small">{{ form.brand.errors }}</div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">{{ form.model.label }}</label>
+                                    {{ form.model }}
+                                    <div class="text-danger small">{{ form.model.errors }}</div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">{{ form.license_plate.label }}</label>
+                                    {{ form.license_plate }}
+                                    <div class="text-danger small">{{ form.license_plate.errors }}</div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">{{ form.year.label }}</label>
+                                    {{ form.year }}
+                                    <div class="text-danger small">{{ form.year.errors }}</div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">{{ form.vehicle_type.label }}</label>
+                                    {{ form.vehicle_type }}
+                                    <div class="text-danger small">{{ form.vehicle_type.errors }}</div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">{{ form.color.label }}</label>
+                                    {{ form.color }}
+                                    <div class="text-danger small">{{ form.color.errors }}</div>
+                                </div>
+
+                                <div class="col-12">
+                                    <label class="form-label">{{ form.photo.label }}</label>
+                                    {{ form.photo }}
+                                    <div class="text-danger small">{{ form.photo.errors }}</div>
+                                </div>
+                            </div>
+
+                            <div class="mt-4">
+                                <button type="submit" class="btn btn-primary">
+                                    Додати автомобіль
+                                </button>
+
+                                <a href="{% url 'vehicles:vehicle_list' %}" class="btn btn-outline-secondary">
+                                    Скасувати
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
