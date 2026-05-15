@@ -1,4 +1,9 @@
 {% extends 'base.html' %}
+{% block extra_head %}
+    {% if parking.has_coordinates %}
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    {% endif %}
+{% endblock %}
 
 {% block title %}{{ parking.name }} | Parking System{% endblock %}
 
@@ -21,6 +26,25 @@
                     {{ parking.description }}
                 </p>
             {% endif %}
+
+            {% if parking.has_coordinates %}
+    <div class="mb-4">
+        <a href="{{ parking.google_maps_url }}" target="_blank" class="btn btn-outline-success">
+            Відкрити розташування в Google Maps
+        </a>
+    </div>
+
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <h5 class="fw-bold mb-3">Розташування парковки</h5>
+            <div id="parking-map" style="height: 350px; border-radius: 12px;"></div>
+        </div>
+    </div>
+{% else %}
+    <div class="alert alert-warning">
+        Для цієї парковки ще не вказано координати.
+    </div>
+{% endif %}
 
             {% if search_performed %}
                 <p class="small text-muted">
@@ -160,4 +184,27 @@
         text-align: center;
     }
 </style>
+{% endblock %}
+
+{% block extra_scripts %}
+    {% if parking.has_coordinates %}
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+        <script>
+            const parkingLat = parseFloat("{{ parking.latitude }}".replace(",", "."));
+            const parkingLng = parseFloat("{{ parking.longitude }}".replace(",", "."));
+
+            const map = L.map('parking-map').setView([parkingLat, parkingLng], 16);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
+
+            L.marker([parkingLat, parkingLng])
+                .addTo(map)
+                .bindPopup("<strong>{{ parking.name }}</strong><br>{{ parking.address }}")
+                .openPopup();
+        </script>
+    {% endif %}
 {% endblock %}

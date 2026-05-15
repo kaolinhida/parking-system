@@ -5,7 +5,7 @@ from .models import ParkingLot, ParkingSpaceType, ParkingSpace, Tariff
 
 @admin.register(ParkingLot)
 class ParkingLotAdmin(admin.ModelAdmin):
-    list_display = ('name', 'address', 'is_active', 'created_at')
+    list_display = ('name', 'address', 'latitude', 'longitude', 'is_active', 'created_at')
     list_filter = ('is_active',)
     search_fields = ('name', 'address')
 

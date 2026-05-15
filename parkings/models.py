@@ -4,6 +4,20 @@ from django.db import models
 class ParkingLot(models.Model):
     name = models.CharField(max_length=100, verbose_name='Назва парковки')
     address = models.CharField(max_length=255, verbose_name='Адреса')
+    latitude = models.DecimalField(
+        max_digits=9,
+        decimal_places=6,
+        null=True,
+        blank=True,
+        verbose_name='Широта'
+    )
+    longitude = models.DecimalField(
+        max_digits=9,
+        decimal_places=6,
+        null=True,
+        blank=True,
+        verbose_name='Довгота'
+    )
     description = models.TextField(blank=True, verbose_name='Опис')
     is_active = models.BooleanField(default=True, verbose_name='Активна')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата створення')
@@ -12,6 +26,16 @@ class ParkingLot(models.Model):
         verbose_name = 'Парковка'
         verbose_name_plural = 'Парковки'
         ordering = ['name']
+
+    @property
+    def has_coordinates(self):
+        return self.latitude is not None and self.longitude is not None
+
+    @property
+    def google_maps_url(self):
+        if not self.has_coordinates:
+            return ''
+        return f'https://www.google.com/maps/search/?api=1&query={self.latitude},{self.longitude}'
 
     def __str__(self):
         return self.name

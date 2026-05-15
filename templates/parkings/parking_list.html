@@ -34,9 +34,17 @@
                                     Кількість місць: {{ parking.spaces_count }}
                                 </p>
 
-                                <a href="{% url 'parkings:parking_detail' parking.id %}" class="btn btn-primary">
-                                    Переглянути парковку
-                                </a>
+                                <div class="d-flex gap-2 flex-wrap">
+    <a href="{% url 'parkings:parking_detail' parking.id %}" class="btn btn-primary">
+        Переглянути парковку
+    </a>
+
+    {% if parking.has_coordinates %}
+        <a href="{{ parking.google_maps_url }}" target="_blank" class="btn btn-outline-success">
+            Google Maps
+        </a>
+    {% endif %}
+</div>
                             </div>
                         </div>
                     </div>
