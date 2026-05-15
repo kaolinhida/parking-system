@@ -154,13 +154,31 @@
                                             </span>
                                         </div>
 
-                                        {% if search_performed and space.display_status == 'available' and space.tariff %}
-                                            <div class="mt-2">
-                                                <a href="{% url 'reservations:create_reservation' space.id %}?{{ request.GET.urlencode }}" class="btn btn-sm btn-outline-success">
-    Забронювати
-</a>
-                                            </div>
-                                        {% endif %}
+                                        {% if space.display_status != 'inactive' %}
+    <div class="mt-2">
+        {% if search_performed %}
+            {% if space.display_status == 'available' and space.tariff %}
+                <a href="{% url 'reservations:create_reservation' space.id %}?{{ request.GET.urlencode }}" class="btn btn-sm btn-outline-success">
+                    Забронювати
+                </a>
+            {% elif space.display_status == 'occupied' %}
+                <button class="btn btn-sm btn-outline-secondary" disabled>
+                    Зайняте
+                </button>
+            {% endif %}
+        {% else %}
+            {% if space.tariff %}
+                <a href="{% url 'reservations:create_reservation' space.id %}" class="btn btn-sm btn-outline-success">
+                    Обрати час
+                </a>
+            {% else %}
+                <button class="btn btn-sm btn-outline-secondary" disabled>
+                    Немає тарифу
+                </button>
+            {% endif %}
+        {% endif %}
+    </div>
+{% endif %}
                                     </div>
                             {% endfor %}
                         </div>

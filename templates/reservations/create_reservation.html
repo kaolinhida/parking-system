@@ -13,7 +13,7 @@
             <h1 class="fw-bold mt-3">Бронювання паркомісця {{ parking_space.number }}</h1>
 
             <p class="text-muted mb-0">
-                Перевірте дані бронювання та виберіть автомобіль із вашого гаража.
+                Оберіть дату, час та автомобіль для створення бронювання.
             </p>
         </div>
 
@@ -21,7 +21,7 @@
             <div class="col-lg-7">
                 <div class="card border-0 shadow-sm">
                     <div class="card-body p-4">
-                        <h5 class="fw-bold mb-3">Дані бронювання</h5>
+                        <h5 class="fw-bold mb-3">Дані паркомісця</h5>
 
                         <div class="table-responsive">
                             <table class="table">
@@ -47,31 +47,40 @@
                                     </tr>
 
                                     <tr>
-                                        <th>Час початку</th>
-                                        <td>{{ start_datetime|date:"d.m.Y H:i" }}</td>
-                                    </tr>
-
-                                    <tr>
-                                        <th>Час завершення</th>
-                                        <td>{{ end_datetime|date:"d.m.Y H:i" }}</td>
-                                    </tr>
-
-                                    <tr>
-                                        <th>Тривалість</th>
-                                        <td>{{ duration_hours }} год.</td>
-                                    </tr>
-
-                                    <tr>
                                         <th>Тариф</th>
                                         <td>{{ tariff.price_per_hour }} грн/год</td>
                                     </tr>
 
-                                    <tr>
-                                        <th>Загальна вартість</th>
-                                        <td>
-                                            <strong>{{ total_price }} грн</strong>
-                                        </td>
-                                    </tr>
+                                    {% if start_datetime and end_datetime %}
+                                        <tr>
+                                            <th>Час початку</th>
+                                            <td>{{ start_datetime|date:"d.m.Y H:i" }}</td>
+                                        </tr>
+
+                                        <tr>
+                                            <th>Час завершення</th>
+                                            <td>{{ end_datetime|date:"d.m.Y H:i" }}</td>
+                                        </tr>
+
+                                        <tr>
+                                            <th>Тривалість</th>
+                                            <td>{{ duration_hours }} год.</td>
+                                        </tr>
+
+                                        <tr>
+                                            <th>Орієнтовна вартість</th>
+                                            <td>
+                                                <strong>{{ total_price }} грн</strong>
+                                            </td>
+                                        </tr>
+                                    {% else %}
+                                        <tr>
+                                            <th>Вартість</th>
+                                            <td class="text-muted">
+                                                Буде розрахована після вибору дати й часу.
+                                            </td>
+                                        </tr>
+                                    {% endif %}
                                 </tbody>
                             </table>
                         </div>
@@ -85,35 +94,74 @@
                                 </div>
                             {% endif %}
 
-                            {% if has_vehicles %}
-                                <div class="mb-3">
-                                    <label class="form-label">{{ form.vehicle.label }}</label>
-                                    {{ form.vehicle }}
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label class="form-label">{{ form.date.label }}</label>
+                                    {{ form.date }}
 
-                                    {% if form.vehicle.errors %}
+                                    {% if form.date.errors %}
                                         <div class="text-danger small mt-1">
-                                            {{ form.vehicle.errors }}
+                                            {{ form.date.errors }}
                                         </div>
                                     {% endif %}
                                 </div>
 
-                                <button type="submit" class="btn btn-success">
-                                    Підтвердити бронювання
-                                </button>
-                            {% else %}
-                                <div class="alert alert-warning">
-                                    Щоб створити бронювання, спочатку додайте автомобіль у розділі
-                                    <strong>“Мій гараж”</strong>.
+                                <div class="col-md-4">
+                                    <label class="form-label">{{ form.start_time.label }}</label>
+                                    {{ form.start_time }}
+
+                                    {% if form.start_time.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {{ form.start_time.errors }}
+                                        </div>
+                                    {% endif %}
                                 </div>
 
-                                <a href="{% url 'vehicles:vehicle_add' %}" class="btn btn-primary">
-                                    Додати автомобіль
-                                </a>
-                            {% endif %}
+                                <div class="col-md-4">
+                                    <label class="form-label">{{ form.end_time.label }}</label>
+                                    {{ form.end_time }}
 
-                            <a href="{% url 'parkings:parking_detail' parking_space.parking_lot.id %}" class="btn btn-outline-secondary">
-                                Скасувати
-                            </a>
+                                    {% if form.end_time.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {{ form.end_time.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="col-12">
+                                    {% if has_vehicles %}
+                                        <label class="form-label">{{ form.vehicle.label }}</label>
+                                        {{ form.vehicle }}
+
+                                        {% if form.vehicle.errors %}
+                                            <div class="text-danger small mt-1">
+                                                {{ form.vehicle.errors }}
+                                            </div>
+                                        {% endif %}
+                                    {% else %}
+                                        <div class="alert alert-warning mb-0">
+                                            Щоб створити бронювання, спочатку додайте автомобіль у розділі
+                                            <strong>“Мій гараж”</strong>.
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="mt-4">
+                                {% if has_vehicles %}
+                                    <button type="submit" class="btn btn-success">
+                                        Підтвердити бронювання
+                                    </button>
+                                {% else %}
+                                    <a href="{% url 'vehicles:vehicle_add' %}" class="btn btn-primary">
+                                        Додати автомобіль
+                                    </a>
+                                {% endif %}
+
+                                <a href="{% url 'parkings:parking_detail' parking_space.parking_lot.id %}" class="btn btn-outline-secondary">
+                                    Скасувати
+                                </a>
+                            </div>
                         </form>
                     </div>
                 </div>
@@ -127,6 +175,7 @@
                         <p class="text-muted mb-0">
                             Онлайн-оплата в системі не використовується. Вартість бронювання
                             розраховується автоматично на основі тарифу та тривалості паркування.
+                            Якщо місце вже зайняте на вибраний проміжок часу, система не дозволить створити бронювання.
                         </p>
                     </div>
                 </div>

@@ -20,20 +20,9 @@ def calculate_duration_hours(start_time, end_time):
     return max(1, math.ceil(hours))
 
 
-@login_required
-def create_reservation(request, space_id):
-    parking_space = get_object_or_404(
-        ParkingSpace.objects.select_related('parking_lot', 'space_type'),
-        id=space_id,
-        is_active=True
-    )
-
-    date_value = request.GET.get('date')
-    start_value = request.GET.get('start_time')
-    end_value = request.GET.get('end_time')
-
+def parse_get_datetime(date_value, start_value, end_value):
     if not date_value or not start_value or not end_value:
-        return redirect('parkings:parking_detail', parking_space.parking_lot.id)
+        return None, None
 
     try:
         selected_date = datetime.strptime(date_value, '%Y-%m-%d').date()
@@ -46,11 +35,22 @@ def create_reservation(request, space_id):
         end_datetime = timezone.make_aware(
             datetime.combine(selected_date, selected_end_time)
         )
-    except ValueError:
-        return redirect('parkings:parking_detail', parking_space.parking_lot.id)
 
-    if end_datetime <= start_datetime:
-        return redirect('parkings:parking_detail', parking_space.parking_lot.id)
+        if end_datetime <= start_datetime:
+            return None, None
+
+        return start_datetime, end_datetime
+    except ValueError:
+        return None, None
+
+
+@login_required
+def create_reservation(request, space_id):
+    parking_space = get_object_or_404(
+        ParkingSpace.objects.select_related('parking_lot', 'space_type'),
+        id=space_id,
+        is_active=True
+    )
 
     tariff = get_object_or_404(
         Tariff,
@@ -59,17 +59,46 @@ def create_reservation(request, space_id):
         is_active=True
     )
 
-    duration_hours = calculate_duration_hours(start_datetime, end_datetime)
-    price_per_hour = tariff.price_per_hour
-    total_price = Decimal(duration_hours) * price_per_hour
-
     user_vehicles = request.user.vehicles.filter(is_active=True)
+
+    date_value = request.GET.get('date')
+    start_value = request.GET.get('start_time')
+    end_value = request.GET.get('end_time')
+
+    initial = {}
+
+    if date_value:
+        initial['date'] = date_value
+
+    if start_value:
+        initial['start_time'] = start_value
+
+    if end_value:
+        initial['end_time'] = end_value
+
+    start_datetime, end_datetime = parse_get_datetime(
+        date_value,
+        start_value,
+        end_value
+    )
+
+    duration_hours = None
+    total_price = None
+
+    if start_datetime and end_datetime:
+        duration_hours = calculate_duration_hours(start_datetime, end_datetime)
+        total_price = Decimal(duration_hours) * tariff.price_per_hour
 
     if request.method == 'POST':
         form = ReservationForm(request.POST, user=request.user)
 
         if form.is_valid():
             selected_vehicle = form.cleaned_data['vehicle']
+            start_datetime = form.cleaned_data['start_datetime']
+            end_datetime = form.cleaned_data['end_datetime']
+
+            duration_hours = calculate_duration_hours(start_datetime, end_datetime)
+            total_price = Decimal(duration_hours) * tariff.price_per_hour
 
             reservation = Reservation(
                 user=request.user,
@@ -79,7 +108,7 @@ def create_reservation(request, space_id):
                 car_number=selected_vehicle.license_plate,
                 start_time=start_datetime,
                 end_time=end_datetime,
-                price_per_hour=price_per_hour,
+                price_per_hour=tariff.price_per_hour,
                 total_price=total_price,
                 status=Reservation.STATUS_ACTIVE,
             )
@@ -92,7 +121,7 @@ def create_reservation(request, space_id):
             except ValidationError as error:
                 form.add_error(None, error)
     else:
-        form = ReservationForm(user=request.user)
+        form = ReservationForm(user=request.user, initial=initial)
 
     return render(request, 'reservations/create_reservation.html', {
         'form': form,
