@@ -112,17 +112,21 @@
                                     </td>
                                     <td>{{ reservation.total_price }} грн</td>
                                     <td>
-                                        {% if reservation.status == 'active' %}
-                                            <form method="post" action="{% url 'reservations:cancel_reservation' reservation.id %}">
-                                                {% csrf_token %}
-                                                <button type="submit" class="btn btn-sm btn-outline-danger">
-                                                Скасувати
-                                                </button>
-                                            </form>
-                                        {% else %}
-                                            —
-                                        {% endif %}
-                                    </td>
+    <a href="{% url 'reservations:reservation_qr_page' reservation.id %}" class="btn btn-sm btn-outline-primary mb-1">
+        QR-код
+    </a>
+
+    {% if reservation.status == 'active' %}
+        <form method="post" action="{% url 'reservations:cancel_reservation' reservation.id %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-sm btn-outline-danger">
+                Скасувати
+            </button>
+        </form>
+    {% else %}
+        —
+    {% endif %}
+</td>
                                 </tr>
                             {% endfor %}
                         </tbody>

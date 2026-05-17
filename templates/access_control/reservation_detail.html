@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block title %}Перевірка доступу | Parking System{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="mb-4">
+            <a href="{% url 'access_control:home' %}" class="text-decoration-none">
+                ← Назад до контролю доступу
+            </a>
+
+            <h1 class="fw-bold mt-3">Перевірка доступу</h1>
+            <p class="text-muted mb-0">
+                Поточний час: {{ now|date:"d.m.Y H:i" }}
+            </p>
+        </div>
+
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body p-4">
+                <h5 class="fw-bold mb-3">Дані бронювання</h5>
+
+                <table class="table">
+                    <tbody>
+                        <tr>
+                            <th>Користувач</th>
+                            <td>{{ reservation.user.username }}</td>
+                        </tr>
+                        <tr>
+                            <th>Автомобіль</th>
+                            <td>
+                                {% if reservation.vehicle %}
+                                    {{ reservation.vehicle.brand }} {{ reservation.vehicle.model }} —
+                                {% endif %}
+                                {{ reservation.car_number }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Парковка</th>
+                            <td>{{ reservation.parking_space.parking_lot.name }}</td>
+                        </tr>
+                        <tr>
+                            <th>Місце</th>
+                            <td>{{ reservation.parking_space.number }}</td>
+                        </tr>
+                        <tr>
+                            <th>Період</th>
+                            <td>
+                                {{ reservation.start_time|date:"d.m.Y H:i" }}
+                                —
+                                {{ reservation.end_time|date:"d.m.Y H:i" }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Статус</th>
+                            <td>{{ reservation.get_status_display }}</td>
+                        </tr>
+                        <tr>
+                            <th>Час в’їзду</th>
+                            <td>
+                                {% if reservation.check_in_time %}
+                                    {{ reservation.check_in_time|date:"d.m.Y H:i" }}
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Час виїзду</th>
+                            <td>
+                                {% if reservation.check_out_time %}
+                                    {{ reservation.check_out_time|date:"d.m.Y H:i" }}
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="mt-4">
+                    {% if can_check_in %}
+                        <div class="alert alert-success">
+                            Доступ дозволено. Бронювання активне, можна підтвердити в’їзд.
+                        </div>
+
+                        <form method="post" action="{% url 'access_control:check_in' reservation.access_token %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-success">
+                                Підтвердити в’їзд
+                            </button>
+                        </form>
+                    {% elif can_check_out %}
+                        <div class="alert alert-info">
+                            Автомобіль перебуває на парковці. Можна підтвердити виїзд.
+                        </div>
+
+                        <form method="post" action="{% url 'access_control:check_out' reservation.access_token %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-primary">
+                                Підтвердити виїзд
+                            </button>
+                        </form>
+                    {% else %}
+                        <div class="alert alert-warning mb-0">
+                            Для цього бронювання зараз немає доступної дії.
+                            Можливі причини: неправильний час, скасоване бронювання,
+                            вже підтверджений в’їзд або бронювання вже завершене.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

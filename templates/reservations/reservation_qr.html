@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block title %}QR-код бронювання | Parking System{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="mb-4">
+            <a href="{% url 'accounts:profile' %}" class="text-decoration-none">
+                ← Назад до кабінету
+            </a>
+
+            <h1 class="fw-bold mt-3">QR-код бронювання</h1>
+            <p class="text-muted mb-0">
+                Покажіть цей QR-код на умовному сканері шлагбаума.
+            </p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-5">
+                <div class="card border-0 shadow-sm text-center">
+                    <div class="card-body p-4">
+                        <img src="{% url 'reservations:reservation_qr_image' reservation.id %}"
+                             alt="QR-код бронювання"
+                             class="img-fluid"
+                             style="max-width: 280px;">
+
+                        <p class="text-muted small mt-3 mb-0">
+                            Унікальний код доступу до бронювання
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-7">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-3">Дані бронювання</h5>
+
+                        <table class="table">
+                            <tbody>
+                                <tr>
+                                    <th>Парковка</th>
+                                    <td>{{ reservation.parking_space.parking_lot.name }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Місце</th>
+                                    <td>{{ reservation.parking_space.number }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Авто</th>
+                                    <td>{{ reservation.car_number }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Час</th>
+                                    <td>
+                                        {{ reservation.start_time|date:"d.m.Y H:i" }}
+                                        —
+                                        {{ reservation.end_time|date:"d.m.Y H:i" }}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Статус</th>
+                                    <td>{{ reservation.get_status_display }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Час в’їзду</th>
+                                    <td>
+                                        {% if reservation.check_in_time %}
+                                            {{ reservation.check_in_time|date:"d.m.Y H:i" }}
+                                        {% else %}
+                                            —
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Час виїзду</th>
+                                    <td>
+                                        {% if reservation.check_out_time %}
+                                            {{ reservation.check_out_time|date:"d.m.Y H:i" }}
+                                        {% else %}
+                                            —
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="alert alert-info mb-0">
+                            QR-код можна використати для одного в’їзду та одного виїзду.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

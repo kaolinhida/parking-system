@@ -1,11 +1,15 @@
 import math
 from datetime import datetime
 from decimal import Decimal
+from io import BytesIO
 
+import qrcode
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.utils import timezone
 
 from parkings.models import ParkingSpace, Tariff
@@ -155,3 +159,54 @@ def cancel_reservation(request, reservation_id):
 
     messages.success(request, 'Бронювання успішно скасовано.')
     return redirect('accounts:profile')
+
+@login_required
+def reservation_qr_page(request, reservation_id):
+    reservation = get_object_or_404(
+        Reservation.objects.select_related(
+            'parking_space',
+            'parking_space__parking_lot',
+            'parking_space__space_type',
+            'vehicle',
+        ),
+        id=reservation_id,
+        user=request.user
+    )
+
+    return render(request, 'reservations/reservation_qr.html', {
+        'reservation': reservation,
+    })
+
+
+@login_required
+def reservation_qr_image(request, reservation_id):
+    reservation = get_object_or_404(
+        Reservation,
+        id=reservation_id,
+        user=request.user
+    )
+
+    if not reservation.access_token:
+        reservation.save()
+
+    access_url = request.build_absolute_uri(
+        reverse('access_control:reservation_detail', args=[reservation.access_token])
+    )
+
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_M,
+        box_size=10,
+        border=4,
+    )
+
+    qr.add_data(access_url)
+    qr.make(fit=True)
+
+    img = qr.make_image(fill_color='black', back_color='white')
+
+    buffer = BytesIO()
+    img.save(buffer, format='PNG')
+    buffer.seek(0)
+
+    return HttpResponse(buffer.getvalue(), content_type='image/png')

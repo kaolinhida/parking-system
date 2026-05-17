@@ -26,6 +26,7 @@ urlpatterns = [
     path('accounts/', include('accounts.urls')),
     path('reservations/', include('reservations.urls')),
     path('vehicles/', include('vehicles.urls')),
+    path('access-control/', include('access_control.urls')),
 ]
 
 if settings.DEBUG:
