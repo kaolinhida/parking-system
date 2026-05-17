@@ -1,6 +1,9 @@
+import math
+
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
+from django.utils import timezone
 
 from reservations.models import Reservation
 from .forms import RegisterForm
@@ -27,6 +30,14 @@ def register(request):
 
 @login_required
 def profile(request):
+    now = timezone.now()
+
+    Reservation.objects.filter(
+        user=request.user,
+        status=Reservation.STATUS_ACTIVE,
+        end_time__lt=now,
+    ).update(status=Reservation.STATUS_COMPLETED)
+
     reservations = (
         Reservation.objects
         .filter(user=request.user)
@@ -34,6 +45,7 @@ def profile(request):
             'parking_space',
             'parking_space__parking_lot',
             'parking_space__space_type',
+            'vehicle',
         )
         .order_by('-created_at')
     )
@@ -42,6 +54,21 @@ def profile(request):
     checked_in_count = reservations.filter(status=Reservation.STATUS_CHECKED_IN).count()
     cancelled_count = reservations.filter(status=Reservation.STATUS_CANCELLED).count()
     completed_count = reservations.filter(status=Reservation.STATUS_COMPLETED).count()
+
+    for reservation in reservations:
+        reservation.overtime_hours_display = 0
+        reservation.overtime_fee_display = 0
+
+        if (
+            reservation.status == Reservation.STATUS_CHECKED_IN
+            and reservation.end_time
+            and now > reservation.end_time
+        ):
+            duration = now - reservation.end_time
+            overtime_seconds = duration.total_seconds()
+            overtime_hours = math.ceil(overtime_seconds / 3600)
+            reservation.overtime_hours_display = max(1, overtime_hours)
+            reservation.overtime_fee_display = reservation.overtime_hours_display * reservation.price_per_hour
 
     return render(request, 'accounts/profile.html', {
         'reservations': reservations,

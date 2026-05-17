@@ -12,7 +12,7 @@
             </p>
         </div>
 
-        <div class="row g-4 mb-4">
+        <div class="row g-4 mb-5">
             <div class="col-lg-4">
                 <div class="card border-0 shadow-sm h-100">
                     <div class="card-body">
@@ -36,8 +36,8 @@
 
             <div class="col-lg-8">
                 <div class="row g-3">
-                    <div class="col-md-4">
-                        <div class="card border-0 shadow-sm">
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="card border-0 shadow-sm h-100">
                             <div class="card-body text-center">
                                 <div class="h2 fw-bold text-primary">{{ active_count }}</div>
                                 <div class="text-muted">Активні</div>
@@ -45,18 +45,17 @@
                         </div>
                     </div>
 
-            <div class="col-md-3">
-                <div class="card border-0 shadow-sm">
-                    <div class="card-body text-center">
-                        <div class="h2 fw-bold text-info">{{ checked_in_count }}</div>
-                        <div class="text-muted">На парковці</div>
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body text-center">
+                                <div class="h2 fw-bold text-info">{{ checked_in_count }}</div>
+                                <div class="text-muted">На парковці</div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
-        </div>
 
-                    <div class="col-md-4">
-                        <div class="card border-0 shadow-sm">
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="card border-0 shadow-sm h-100">
                             <div class="card-body text-center">
                                 <div class="h2 fw-bold text-success">{{ completed_count }}</div>
                                 <div class="text-muted">Завершені</div>
@@ -64,8 +63,8 @@
                         </div>
                     </div>
 
-                    <div class="col-md-4">
-                        <div class="card border-0 shadow-sm">
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="card border-0 shadow-sm h-100">
                             <div class="card-body text-center">
                                 <div class="h2 fw-bold text-danger">{{ cancelled_count }}</div>
                                 <div class="text-muted">Скасовані</div>
@@ -96,6 +95,7 @@
                                 <th>Час</th>
                                 <th>Статус</th>
                                 <th>Вартість</th>
+                                <th>Борг</th>
                                 <th>Дія</th>
                             </tr>
                         </thead>
@@ -111,36 +111,52 @@
                                         —
                                         {{ reservation.end_time|date:"d.m.Y H:i" }}
                                     </td>
+
                                     <td>
                                         {% if reservation.status == 'active' %}
-    <span class="badge bg-primary">Активне</span>
-{% elif reservation.status == 'checked_in' %}
-    <span class="badge bg-info text-dark">Авто на парковці</span>
-{% elif reservation.status == 'cancelled' %}
-    <span class="badge bg-danger">Скасоване</span>
-{% elif reservation.status == 'completed' %}
-    <span class="badge bg-success">Завершене</span>
-{% else %}
-    <span class="badge bg-secondary">{{ reservation.get_status_display }}</span>
-{% endif %}
+                                            <span class="badge bg-primary">Активне</span>
+                                        {% elif reservation.status == 'checked_in' %}
+                                            <span class="badge bg-info text-dark">Авто на парковці</span>
+                                        {% elif reservation.status == 'cancelled' %}
+                                            <span class="badge bg-danger">Скасоване</span>
+                                        {% elif reservation.status == 'completed' %}
+                                            <span class="badge bg-success">Завершене</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">{{ reservation.get_status_display }}</span>
+                                        {% endif %}
                                     </td>
-                                    <td>{{ reservation.total_price }} грн</td>
-                                    <td>
-    <a href="{% url 'reservations:reservation_qr_page' reservation.id %}" class="btn btn-sm btn-outline-primary mb-1">
-        QR-код
-    </a>
 
-    {% if reservation.status == 'active' %}
-        <form method="post" action="{% url 'reservations:cancel_reservation' reservation.id %}">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-sm btn-outline-danger">
-                Скасувати
-            </button>
-        </form>
-    {% else %}
-        —
-    {% endif %}
-</td>
+                                    <td>{{ reservation.total_price }} грн</td>
+
+                                    <td>
+                                        {% if reservation.overtime_fee_display %}
+                                            <span class="text-danger fw-bold">
+                                                {{ reservation.overtime_fee_display }} грн
+                                            </span>
+                                            <div class="small text-muted">
+                                                {{ reservation.overtime_hours_display }} год. понад час
+                                            </div>
+                                        {% else %}
+                                            —
+                                        {% endif %}
+                                    </td>
+
+                                    <td>
+                                        <a href="{% url 'reservations:reservation_qr_page' reservation.id %}" class="btn btn-sm btn-outline-primary mb-1">
+                                            QR-код
+                                        </a>
+
+                                        {% if reservation.status == 'active' %}
+                                            <form method="post" action="{% url 'reservations:cancel_reservation' reservation.id %}">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                    Скасувати
+                                                </button>
+                                            </form>
+                                        {% else %}
+                                            —
+                                        {% endif %}
+                                    </td>
                                 </tr>
                             {% endfor %}
                         </tbody>
