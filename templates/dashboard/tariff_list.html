@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block title %}Керування тарифами | Parking System{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+            <div>
+                <a href="{% url 'dashboard:home' %}" class="text-decoration-none">
+                    ← Назад до Dashboard
+                </a>
+
+                <h1 class="fw-bold mt-3">Керування тарифами</h1>
+
+                <p class="text-muted mb-0">
+                    Налаштування вартості паркування для кожної парковки та типу паркомісця.
+                </p>
+            </div>
+
+            <a href="{% url 'dashboard:tariff_add' %}" class="btn btn-primary">
+                Створити тариф
+            </a>
+        </div>
+
+        {% if tariffs %}
+            <div class="card border-0 shadow-sm">
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0 text-nowrap">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Парковка</th>
+                                <th>Тип паркомісця</th>
+                                <th>Ціна за годину</th>
+                                <th>Статус</th>
+                                <th>Дія</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for tariff in tariffs %}
+                                <tr>
+                                    <td>{{ tariff.parking_lot.name }}</td>
+                                    <td>{{ tariff.space_type.name }}</td>
+                                    <td>
+                                        <strong>{{ tariff.price_per_hour }} грн/год</strong>
+                                    </td>
+                                    <td>
+                                        {% if tariff.is_active %}
+                                            <span class="badge bg-success">Активний</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Неактивний</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'dashboard:tariff_edit' tariff.id %}" class="btn btn-sm btn-outline-primary">
+                                            Редагувати
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                Тарифи ще не створено.
+                <a href="{% url 'dashboard:tariff_add' %}" class="alert-link">
+                    Створити перший тариф
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} | Parking System{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="mb-4">
+            <a href="{% url 'dashboard:tariff_list' %}" class="text-decoration-none">
+                ← Назад до тарифів
+            </a>
+
+            <h1 class="fw-bold mt-3">{{ title }}</h1>
+
+            <p class="text-muted mb-0">
+                Вкажіть парковку, тип паркомісця та вартість однієї години паркування.
+            </p>
+        </div>
+
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <form method="post" class="row g-3">
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                        <div class="col-12">
+                            <div class="alert alert-danger mb-0">
+                                {{ form.non_field_errors }}
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <div class="col-md-6">
+                        <label class="form-label">{{ form.parking_lot.label }}</label>
+                        {{ form.parking_lot }}
+                        <div class="text-danger small">{{ form.parking_lot.errors }}</div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">{{ form.space_type.label }}</label>
+                        {{ form.space_type }}
+                        <div class="text-danger small">{{ form.space_type.errors }}</div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">{{ form.price_per_hour.label }}</label>
+                        <div class="input-group">
+                            {{ form.price_per_hour }}
+                            <span class="input-group-text">грн/год</span>
+                        </div>
+                        <div class="text-danger small">{{ form.price_per_hour.errors }}</div>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="form-check">
+                            {{ form.is_active }}
+                            <label class="form-check-label" for="{{ form.is_active.id_for_label }}">
+                                {{ form.is_active.label }}
+                            </label>
+                        </div>
+                        <div class="text-danger small">{{ form.is_active.errors }}</div>
+                    </div>
+
+                    <div class="col-12 d-flex flex-wrap gap-2 stacked-actions">
+                        <button type="submit" class="btn btn-primary">
+                            {{ submit_label }}
+                        </button>
+
+                        <a href="{% url 'dashboard:tariff_list' %}" class="btn btn-outline-secondary">
+                            Скасувати
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

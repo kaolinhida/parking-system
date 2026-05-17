@@ -9,7 +9,7 @@ from django.utils import timezone
 
 from parkings.models import ParkingLot, ParkingSpace, Tariff
 from reservations.models import Reservation
-from .forms import ParkingGridForm, ParkingSpaceEditForm
+from .forms import ParkingGridForm, ParkingSpaceEditForm, TariffForm
 
 
 @staff_member_required
@@ -254,4 +254,63 @@ def dashboard_space_edit(request, space_id):
     return render(request, 'dashboard/space_edit.html', {
         'form': form,
         'space': space,
+    })
+
+
+@staff_member_required
+def dashboard_tariff_list(request):
+    tariffs = (
+        Tariff.objects
+        .select_related('parking_lot', 'space_type')
+        .order_by('parking_lot__name', 'space_type__name')
+    )
+
+    return render(request, 'dashboard/tariff_list.html', {
+        'tariffs': tariffs,
+    })
+
+
+@staff_member_required
+def dashboard_tariff_add(request):
+    if request.method == 'POST':
+        form = TariffForm(request.POST)
+
+        if form.is_valid():
+            form.save()
+
+            messages.success(request, 'Тариф успішно створено.')
+            return redirect('dashboard:tariff_list')
+    else:
+        form = TariffForm()
+
+    return render(request, 'dashboard/tariff_form.html', {
+        'form': form,
+        'title': 'Створити тариф',
+        'submit_label': 'Створити тариф',
+    })
+
+
+@staff_member_required
+def dashboard_tariff_edit(request, tariff_id):
+    tariff = get_object_or_404(
+        Tariff.objects.select_related('parking_lot', 'space_type'),
+        id=tariff_id
+    )
+
+    if request.method == 'POST':
+        form = TariffForm(request.POST, instance=tariff)
+
+        if form.is_valid():
+            form.save()
+
+            messages.success(request, 'Тариф успішно оновлено.')
+            return redirect('dashboard:tariff_list')
+    else:
+        form = TariffForm(instance=tariff)
+
+    return render(request, 'dashboard/tariff_form.html', {
+        'form': form,
+        'tariff': tariff,
+        'title': 'Редагувати тариф',
+        'submit_label': 'Зберегти зміни',
     })
