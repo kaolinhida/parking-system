@@ -169,6 +169,10 @@
 
                                     <td>
                                         <div class="d-flex flex-column gap-1 align-items-start">
+                                            <a href="{% url 'reservations:reservation_detail' reservation.id %}" class="btn btn-sm btn-outline-secondary">
+                                                Деталі
+                                            </a>
+                                            
                                             <a href="{% url 'reservations:reservation_qr_page' reservation.id %}" class="btn btn-sm btn-outline-primary">
                                                 QR-код
                                             </a>

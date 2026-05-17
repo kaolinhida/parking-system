@@ -210,3 +210,46 @@ def reservation_qr_image(request, reservation_id):
     buffer.seek(0)
 
     return HttpResponse(buffer.getvalue(), content_type='image/png')
+
+@login_required
+def reservation_detail(request, reservation_id):
+    reservation = get_object_or_404(
+        Reservation.objects.select_related(
+            'user',
+            'parking_space',
+            'parking_space__parking_lot',
+            'parking_space__space_type',
+            'vehicle',
+            'tariff',
+        ),
+        id=reservation_id,
+        user=request.user
+    )
+
+    now = timezone.now()
+
+    overtime_hours_display = 0
+    overtime_fee_display = reservation.overtime_fee
+    final_price_display = reservation.final_price or reservation.total_price
+
+    if (
+        reservation.status == Reservation.STATUS_CHECKED_IN
+        and reservation.end_time
+        and now > reservation.end_time
+    ):
+        overtime_hours_display = reservation.overtime_hours(now)
+        overtime_fee_display = reservation.calculate_overtime_fee(now)
+        final_price_display = reservation.total_price + overtime_fee_display
+
+    if reservation.status == Reservation.STATUS_COMPLETED:
+        overtime_hours_display = reservation.overtime_hours(reservation.check_out_time)
+        overtime_fee_display = reservation.overtime_fee
+        final_price_display = reservation.final_price or reservation.total_price
+
+    return render(request, 'reservations/reservation_detail.html', {
+        'reservation': reservation,
+        'now': now,
+        'overtime_hours_display': overtime_hours_display,
+        'overtime_fee_display': overtime_fee_display,
+        'final_price_display': final_price_display,
+    })

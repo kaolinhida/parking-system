@@ -1,0 +1,207 @@
+{% extends 'base.html' %}
+
+{% block title %}Деталі бронювання | Parking System{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="mb-4">
+            <a href="{% url 'accounts:profile' %}" class="text-decoration-none">
+                ← Назад до кабінету
+            </a>
+
+            <h1 class="fw-bold mt-3">Деталі бронювання</h1>
+
+            <p class="text-muted mb-0">
+                Повна інформація про вибране бронювання.
+            </p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-3">Основна інформація</h5>
+
+                        <div class="table-responsive">
+                            <table class="table">
+                                <tbody>
+                                    <tr>
+                                        <th>Парковка</th>
+                                        <td>{{ reservation.parking_space.parking_lot.name }}</td>
+                                    </tr>
+
+                                    <tr>
+                                        <th>Адреса</th>
+                                        <td>{{ reservation.parking_space.parking_lot.address }}</td>
+                                    </tr>
+
+                                    <tr>
+                                        <th>Паркомісце</th>
+                                        <td>{{ reservation.parking_space.number }}</td>
+                                    </tr>
+
+                                    <tr>
+                                        <th>Тип місця</th>
+                                        <td>{{ reservation.parking_space.space_type.name }}</td>
+                                    </tr>
+
+                                    <tr>
+                                        <th>Автомобіль</th>
+                                        <td>
+                                            {% if reservation.vehicle %}
+                                                {{ reservation.vehicle.brand }} {{ reservation.vehicle.model }} —
+                                            {% endif %}
+                                            {{ reservation.car_number }}
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <th>Період бронювання</th>
+                                        <td>
+                                            {{ reservation.start_time|date:"d.m.Y H:i" }}
+                                            —
+                                            {{ reservation.end_time|date:"d.m.Y H:i" }}
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <th>Статус</th>
+                                        <td>
+                                            {% if reservation.status == 'active' %}
+                                                <span class="badge bg-primary">Активне</span>
+                                            {% elif reservation.status == 'checked_in' %}
+                                                <span class="badge bg-info text-dark">Авто на парковці</span>
+                                            {% elif reservation.status == 'completed' %}
+                                                <span class="badge bg-success">Завершене</span>
+                                            {% elif reservation.status == 'cancelled' %}
+                                                <span class="badge bg-danger">Скасоване</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">
+                                                    {{ reservation.get_status_display }}
+                                                </span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <th>Час в’їзду</th>
+                                        <td>
+                                            {% if reservation.check_in_time %}
+                                                {{ reservation.check_in_time|date:"d.m.Y H:i" }}
+                                            {% else %}
+                                                —
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <th>Час виїзду</th>
+                                        <td>
+                                            {% if reservation.check_out_time %}
+                                                {{ reservation.check_out_time|date:"d.m.Y H:i" }}
+                                            {% else %}
+                                                —
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <h5 class="fw-bold mt-4 mb-3">Фінансова інформація</h5>
+
+                        <div class="table-responsive">
+                            <table class="table">
+                                <tbody>
+                                    <tr>
+                                        <th>Тариф</th>
+                                        <td>{{ reservation.price_per_hour }} грн/год</td>
+                                    </tr>
+
+                                    <tr>
+                                        <th>Базова вартість</th>
+                                        <td>{{ reservation.total_price }} грн</td>
+                                    </tr>
+
+                                    <tr>
+                                        <th>Доплата / борг</th>
+                                        <td>
+                                            {% if overtime_fee_display %}
+                                                <span class="text-danger fw-bold">
+                                                    {{ overtime_fee_display }} грн
+                                                </span>
+
+                                                {% if overtime_hours_display %}
+                                                    <div class="small text-muted">
+                                                        {{ overtime_hours_display }} год. понад заброньований час
+                                                    </div>
+                                                {% endif %}
+                                            {% else %}
+                                                —
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <th>Фінальна вартість</th>
+                                        <td>
+                                            {% if reservation.status == 'cancelled' %}
+                                                —
+                                            {% else %}
+                                                <strong>{{ final_price_display }} грн</strong>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {% if reservation.status == 'checked_in' and overtime_fee_display %}
+                            <div class="alert alert-warning mt-3 mb-0">
+                                Автомобіль перебуває на парковці довше, ніж було передбачено бронюванням.
+                                Доплата буде зафіксована під час підтвердження виїзду.
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-3">Дії</h5>
+
+                        <div class="d-grid gap-2">
+                            <a href="{% url 'reservations:reservation_qr_page' reservation.id %}" class="btn btn-outline-primary">
+                                Переглянути QR-код
+                            </a>
+
+                            {% if reservation.status == 'active' %}
+                                <form method="post" action="{% url 'reservations:cancel_reservation' reservation.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-outline-danger w-100">
+                                        Скасувати бронювання
+                                    </button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-3">Примітка</h5>
+
+                        <p class="text-muted mb-0">
+                            QR-код використовується для контролю доступу до парковки.
+                            Після підтвердження в’їзду бронювання переходить у статус
+                            “Авто на парковці”, а після виїзду — у статус “Завершене”.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
