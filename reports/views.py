@@ -1,7 +1,9 @@
+import csv
 from decimal import Decimal
 
 from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import F, Sum
+from django.http import HttpResponse
 from django.shortcuts import render
 from django.utils import timezone
 
@@ -9,10 +11,7 @@ from reservations.models import Reservation
 from .forms import ReportFilterForm
 
 
-@staff_member_required
-def reports_home(request):
-    now = timezone.now()
-
+def complete_expired_active_reservations(now):
     Reservation.objects.filter(
         status=Reservation.STATUS_ACTIVE,
         end_time__lt=now,
@@ -23,7 +22,8 @@ def reports_home(request):
         overtime_fee=0
     )
 
-    reservations = (
+def get_report_reservations():
+    return (
         Reservation.objects
         .select_related(
             'user',
@@ -35,8 +35,8 @@ def reports_home(request):
         .order_by('-start_time')
     )
 
-    form = ReportFilterForm(request.GET or None)
 
+def apply_report_filters(reservations, form):
     if form.is_valid():
         date_from = form.cleaned_data.get('date_from')
         date_to = form.cleaned_data.get('date_to')
@@ -55,24 +55,10 @@ def reports_home(request):
         if status:
             reservations = reservations.filter(status=status)
 
-    total_count = reservations.count()
-    active_count = reservations.filter(status=Reservation.STATUS_ACTIVE).count()
-    checked_in_count = reservations.filter(status=Reservation.STATUS_CHECKED_IN).count()
-    completed_count = reservations.filter(status=Reservation.STATUS_COMPLETED).count()
-    cancelled_count = reservations.filter(status=Reservation.STATUS_CANCELLED).count()
+    return reservations
 
-    financial_reservations = reservations.exclude(
-        status=Reservation.STATUS_CANCELLED
-    )
 
-    total_base_sum = financial_reservations.aggregate(
-        total=Sum('total_price')
-    )['total'] or Decimal('0.00')
-
-    stored_overtime_sum = financial_reservations.aggregate(
-        total=Sum('overtime_fee')
-    )['total'] or Decimal('0.00')
-
+def prepare_report_reservation_display(reservations, now):
     live_overtime_sum = Decimal('0.00')
     live_overtime_count = 0
 
@@ -97,6 +83,40 @@ def reports_home(request):
             reservation.overtime_hours_display = reservation.overtime_hours(reservation.check_out_time)
             reservation.overtime_fee_display = reservation.overtime_fee
             reservation.final_price_display = reservation.final_price or reservation.total_price
+
+    return live_overtime_sum, live_overtime_count
+
+
+@staff_member_required
+def reports_home(request):
+    now = timezone.now()
+    complete_expired_active_reservations(now)
+
+    form = ReportFilterForm(request.GET or None)
+    reservations = apply_report_filters(get_report_reservations(), form)
+
+    total_count = reservations.count()
+    active_count = reservations.filter(status=Reservation.STATUS_ACTIVE).count()
+    checked_in_count = reservations.filter(status=Reservation.STATUS_CHECKED_IN).count()
+    completed_count = reservations.filter(status=Reservation.STATUS_COMPLETED).count()
+    cancelled_count = reservations.filter(status=Reservation.STATUS_CANCELLED).count()
+
+    financial_reservations = reservations.exclude(
+        status=Reservation.STATUS_CANCELLED
+    )
+
+    total_base_sum = financial_reservations.aggregate(
+        total=Sum('total_price')
+    )['total'] or Decimal('0.00')
+
+    stored_overtime_sum = financial_reservations.aggregate(
+        total=Sum('overtime_fee')
+    )['total'] or Decimal('0.00')
+
+    live_overtime_sum, live_overtime_count = prepare_report_reservation_display(
+        reservations,
+        now
+    )
 
     final_sum = Decimal('0.00')
 
@@ -128,3 +148,58 @@ def reports_home(request):
         'live_overtime_count': live_overtime_count,
         'final_sum': final_sum,
     })
+
+
+@staff_member_required
+def reports_export_csv(request):
+    now = timezone.now()
+    complete_expired_active_reservations(now)
+
+    form = ReportFilterForm(request.GET or None)
+    reservations = apply_report_filters(get_report_reservations(), form)
+    prepare_report_reservation_display(reservations, now)
+
+    response = HttpResponse(content_type='text/csv; charset=utf-8')
+    response['Content-Disposition'] = 'attachment; filename="parking_report.csv"'
+    response.write('\ufeff')
+
+    writer = csv.writer(response)
+    writer.writerow([
+        'Користувач',
+        'Парковка',
+        'Місце',
+        'Номер авто',
+        'Дата початку',
+        'Дата завершення',
+        'Статус',
+        'Базова сума',
+        'Доплата',
+        'Фінальна сума',
+    ])
+
+    def format_money(value):
+        if value in (None, ''):
+            return ''
+
+        return f'{value:.2f}'
+
+    for reservation in reservations:
+        final_price = ''
+
+        if reservation.status != Reservation.STATUS_CANCELLED:
+            final_price = reservation.final_price_display
+
+        writer.writerow([
+            reservation.user.username,
+            reservation.parking_space.parking_lot.name,
+            reservation.parking_space.number,
+            reservation.car_number,
+            timezone.localtime(reservation.start_time).strftime('%d.%m.%Y %H:%M'),
+            timezone.localtime(reservation.end_time).strftime('%d.%m.%Y %H:%M'),
+            reservation.get_status_display(),
+            format_money(reservation.total_price),
+            format_money(reservation.overtime_fee_display),
+            format_money(final_price),
+        ])
+
+    return response

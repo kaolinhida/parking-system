@@ -56,6 +56,10 @@
                         <a href="{% url 'reports:home' %}" class="btn btn-outline-secondary">
                             Скинути фільтр
                         </a>
+
+                        <a href="{% url 'reports:export_csv' %}{% if request.GET.urlencode %}?{{ request.GET.urlencode }}{% endif %}" class="btn btn-outline-primary">
+                            Експортувати CSV
+                        </a>
                     </div>
                 </form>
             </div>
