@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block title %}Редагування паркомісця | Parking System{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-7">
+                <div class="mb-4">
+                    <a href="{% url 'dashboard:parking_spaces' space.parking_lot.id %}" class="text-decoration-none">
+                        ← Назад до сітки парковки
+                    </a>
+
+                    <h1 class="fw-bold mt-3">Редагування паркомісця {{ space.number }}</h1>
+
+                    <p class="text-muted mb-0">
+                        Парковка: {{ space.parking_lot.name }}
+                    </p>
+                </div>
+
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <form method="post">
+                            {% csrf_token %}
+
+                            {% if form.non_field_errors %}
+                                <div class="alert alert-danger">
+                                    {{ form.non_field_errors }}
+                                </div>
+                            {% endif %}
+
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label class="form-label">{{ form.number.label }}</label>
+                                    {{ form.number }}
+                                    <div class="text-danger small">{{ form.number.errors }}</div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label">{{ form.row.label }}</label>
+                                    {{ form.row }}
+                                    <div class="text-danger small">{{ form.row.errors }}</div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label">{{ form.column.label }}</label>
+                                    {{ form.column }}
+                                    <div class="text-danger small">{{ form.column.errors }}</div>
+                                </div>
+
+                                <div class="col-12">
+                                    <label class="form-label">{{ form.space_type.label }}</label>
+                                    {{ form.space_type }}
+                                    <div class="text-danger small">{{ form.space_type.errors }}</div>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="form-check">
+                                        {{ form.is_active }}
+                                        <label class="form-check-label">
+                                            {{ form.is_active.label }}
+                                        </label>
+                                    </div>
+
+                                    <div class="form-text">
+                                        Якщо зняти галочку, місце буде позначене як неактивне і користувачі не зможуть його бронювати.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-4">
+                                <button type="submit" class="btn btn-primary">
+                                    Зберегти зміни
+                                </button>
+
+                                <a href="{% url 'dashboard:parking_spaces' space.parking_lot.id %}" class="btn btn-outline-secondary">
+                                    Скасувати
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="alert alert-warning mt-4">
+                    Обережно змінюйте ряд, колонку або номер місця, якщо для цього місця вже існують бронювання.
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

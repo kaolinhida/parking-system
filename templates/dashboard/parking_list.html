@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}Керування парковками | Parking System{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="mb-4">
+            <a href="{% url 'dashboard:home' %}" class="text-decoration-none">
+                ← Назад до Dashboard
+            </a>
+
+            <h1 class="fw-bold mt-3">Керування паркомісцями</h1>
+
+            <p class="text-muted mb-0">
+                Оберіть парковку, щоб переглянути її сітку та відредагувати окремі паркомісця.
+            </p>
+        </div>
+
+        {% if parkings %}
+            <div class="row g-4">
+                {% for parking in parkings %}
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body">
+                                <h5 class="fw-bold">{{ parking.name }}</h5>
+
+                                <p class="text-muted mb-2">
+                                    {{ parking.address }}
+                                </p>
+
+                                <p class="mb-2">
+                                    <strong>Кількість місць:</strong> {{ parking.spaces_count }}
+                                </p>
+
+                                <p class="mb-3">
+                                    {% if parking.is_active %}
+                                        <span class="badge bg-success">Активна</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Неактивна</span>
+                                    {% endif %}
+                                </p>
+
+                                <a href="{% url 'dashboard:parking_spaces' parking.id %}" class="btn btn-primary">
+                                    Керувати місцями
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                Парковок ще немає.
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

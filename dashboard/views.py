@@ -3,13 +3,13 @@ from decimal import Decimal
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 from django.db import transaction
-from django.db.models import F, Sum
-from django.shortcuts import redirect, render
+from django.db.models import Count, F, Sum
+from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 
 from parkings.models import ParkingLot, ParkingSpace, Tariff
 from reservations.models import Reservation
-from .forms import ParkingGridForm
+from .forms import ParkingGridForm, ParkingSpaceEditForm
 
 
 @staff_member_required
@@ -189,4 +189,69 @@ def create_parking_grid(request):
 
     return render(request, 'dashboard/create_parking_grid.html', {
         'form': form,
+    })
+
+@staff_member_required
+def dashboard_parking_list(request):
+    parkings = (
+        ParkingLot.objects
+        .annotate(spaces_count=Count('spaces'))
+        .order_by('name')
+    )
+
+    return render(request, 'dashboard/parking_list.html', {
+        'parkings': parkings,
+    })
+
+
+@staff_member_required
+def dashboard_parking_spaces(request, parking_id):
+    parking = get_object_or_404(ParkingLot, id=parking_id)
+
+    spaces = (
+        parking.spaces
+        .select_related('space_type')
+        .order_by('row', 'column')
+    )
+
+    rows = {}
+
+    for space in spaces:
+        rows.setdefault(space.row, []).append(space)
+
+    parking_rows = [
+        {
+            'row_number': row_number,
+            'spaces': row_spaces,
+        }
+        for row_number, row_spaces in rows.items()
+    ]
+
+    return render(request, 'dashboard/parking_spaces.html', {
+        'parking': parking,
+        'parking_rows': parking_rows,
+    })
+
+
+@staff_member_required
+def dashboard_space_edit(request, space_id):
+    space = get_object_or_404(
+        ParkingSpace.objects.select_related('parking_lot', 'space_type'),
+        id=space_id
+    )
+
+    if request.method == 'POST':
+        form = ParkingSpaceEditForm(request.POST, instance=space)
+
+        if form.is_valid():
+            form.save()
+
+            messages.success(request, 'Дані паркомісця успішно оновлено.')
+            return redirect('dashboard:parking_spaces', parking_id=space.parking_lot.id)
+    else:
+        form = ParkingSpaceEditForm(instance=space)
+
+    return render(request, 'dashboard/space_edit.html', {
+        'form': form,
+        'space': space,
     })

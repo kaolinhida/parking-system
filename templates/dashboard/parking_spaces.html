@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block title %}Місця парковки | Parking System{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="mb-4">
+            <a href="{% url 'dashboard:parking_list' %}" class="text-decoration-none">
+                ← Назад до списку парковок
+            </a>
+
+            <h1 class="fw-bold mt-3">{{ parking.name }}</h1>
+
+            <p class="text-muted mb-1">
+                {{ parking.address }}
+            </p>
+
+            <p class="text-muted mb-0">
+                Керування паркомісцями вибраної парковки.
+            </p>
+        </div>
+
+        <div class="mb-4">
+            <span class="badge bg-success me-2">Активне</span>
+            <span class="badge bg-danger me-2">Неактивне</span>
+        </div>
+
+        {% if parking_rows %}
+            <div class="parking-grid">
+                {% for row in parking_rows %}
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="fw-bold me-3" style="width: 70px;">
+                            Ряд {{ row.row_number }}
+                        </div>
+
+                        <div class="d-flex flex-wrap gap-3">
+                            {% for space in row.spaces %}
+                                <div class="parking-space-card border
+                                    {% if space.is_active %}
+                                        border-success bg-success-subtle
+                                    {% else %}
+                                        border-danger bg-danger-subtle
+                                    {% endif %}
+                                ">
+                                    <div class="fw-bold fs-5">
+                                        {{ space.number }}
+                                    </div>
+
+                                    <div class="small mb-1">
+                                        {{ space.space_type.name }}
+                                    </div>
+
+                                    <div class="mb-2">
+                                        {% if space.is_active %}
+                                            <span class="badge bg-success">Активне</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Неактивне</span>
+                                        {% endif %}
+                                    </div>
+
+                                    <a href="{% url 'dashboard:space_edit' space.id %}" class="btn btn-sm btn-outline-primary">
+                                        Редагувати
+                                    </a>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                Для цієї парковки ще не додано паркомісця.
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+<style>
+    .parking-space-card {
+        width: 155px;
+        min-height: 135px;
+        border-radius: 12px;
+        padding: 12px;
+        text-align: center;
+    }
+</style>
+{% endblock %}

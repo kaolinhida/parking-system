@@ -1,6 +1,6 @@
 from django import forms
 
-from parkings.models import ParkingSpaceType
+from parkings.models import ParkingSpace, ParkingSpaceType
 
 
 class ParkingGridForm(forms.Form):
@@ -96,3 +96,47 @@ class ParkingGridForm(forms.Form):
             'placeholder': 'Наприклад: 30.00',
         })
     )
+
+
+class ParkingSpaceEditForm(forms.ModelForm):
+    class Meta:
+        model = ParkingSpace
+        fields = (
+            'number',
+            'row',
+            'column',
+            'space_type',
+            'is_active',
+        )
+        labels = {
+            'number': 'Номер місця',
+            'row': 'Ряд',
+            'column': 'Колонка',
+            'space_type': 'Тип місця',
+            'is_active': 'Активне місце',
+        }
+        widgets = {
+            'number': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Наприклад: A1',
+            }),
+            'row': forms.NumberInput(attrs={
+                'class': 'form-control',
+            }),
+            'column': forms.NumberInput(attrs={
+                'class': 'form-control',
+            }),
+            'space_type': forms.Select(attrs={
+                'class': 'form-select',
+            }),
+            'is_active': forms.CheckboxInput(attrs={
+                'class': 'form-check-input',
+            }),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields['space_type'].queryset = ParkingSpaceType.objects.filter(
+            is_active=True
+        ).order_by('name')
