@@ -28,7 +28,7 @@
             {% endif %}
 
             {% if parking.has_coordinates %}
-    <div class="mb-4">
+    <div class="mb-4 d-flex flex-wrap gap-2 stacked-actions">
         <a href="{{ parking.google_maps_url }}" target="_blank" class="btn btn-outline-success">
             Відкрити розташування в Google Maps
         </a>
@@ -37,7 +37,7 @@
     <div class="card border-0 shadow-sm mb-4">
         <div class="card-body">
             <h5 class="fw-bold mb-3">Розташування парковки</h5>
-            <div id="parking-map" style="height: 350px; border-radius: 12px;"></div>
+            <div id="parking-map"></div>
         </div>
     </div>
 {% else %}
@@ -92,7 +92,7 @@
                         </div>
                     {% endif %}
 
-                    <div class="col-12">
+                    <div class="col-12 d-flex flex-wrap gap-2 stacked-actions">
                         <button type="submit" class="btn btn-primary">
                             Показати доступні місця
                         </button>
@@ -105,7 +105,7 @@
             </div>
         </div>
 
-        <div class="mb-4">
+        <div class="mb-4 d-flex flex-wrap gap-2">
             <span class="badge bg-success me-2">Вільне</span>
             <span class="badge bg-secondary me-2">Зайняте</span>
             <span class="badge bg-danger me-2">Неактивне</span>
@@ -114,32 +114,32 @@
         {% if parking_rows %}
             <div class="parking-grid">
                 {% for row in parking_rows %}
-                    <div class="d-flex align-items-center mb-3">
-                        <div class="fw-bold me-3" style="width: 60px;">
+                    <div class="d-flex parking-grid-row">
+                        <div class="fw-bold me-3 parking-row-label">
                             Ряд {{ row.row_number }}
                         </div>
 
-                        <div class="d-flex flex-wrap gap-3">
+                        <div class="d-flex flex-wrap parking-space-list">
                             {% for space in row.spaces %}
                                 {% if space.display_status == 'available' %}
-                                    <div class="parking-space-card border border-success bg-success-subtle">
+                                    <div class="parking-space-card parking-space-card--available">
                                 {% elif space.display_status == 'occupied' %}
-                                    <div class="parking-space-card border border-secondary bg-secondary-subtle">
+                                    <div class="parking-space-card parking-space-card--occupied">
                                 {% else %}
-                                    <div class="parking-space-card border border-danger bg-danger-subtle">
+                                    <div class="parking-space-card parking-space-card--inactive">
                                 {% endif %}
-                                        <div class="fw-bold fs-5">{{ space.number }}</div>
+                                        <div class="parking-space-number">{{ space.number }}</div>
 
-                                        <div class="small">
+                                        <div class="parking-space-meta">
                                             {{ space.space_type.name }}
                                         </div>
 
                                         {% if space.tariff %}
-                                            <div class="small">
+                                            <div class="parking-space-price">
                                                 {{ space.tariff.price_per_hour }} грн/год
                                             </div>
                                         {% else %}
-                                            <div class="small text-muted">
+                                            <div class="parking-space-price text-muted">
                                                 Тариф не задано
                                             </div>
                                         {% endif %}
@@ -155,7 +155,7 @@
                                         </div>
 
                                         {% if space.display_status != 'inactive' %}
-    <div class="mt-2">
+    <div class="parking-space-action">
         {% if search_performed %}
             {% if space.display_status == 'available' and space.tariff %}
                 <a href="{% url 'reservations:create_reservation' space.id %}?{{ request.GET.urlencode }}" class="btn btn-sm btn-outline-success">
@@ -193,15 +193,6 @@
     </div>
 </section>
 
-<style>
-    .parking-space-card {
-        width: 150px;
-        min-height: 145px;
-        border-radius: 12px;
-        padding: 12px;
-        text-align: center;
-    }
-</style>
 {% endblock %}
 
 {% block extra_scripts %}

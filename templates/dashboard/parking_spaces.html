@@ -29,29 +29,29 @@
         {% if parking_rows %}
             <div class="parking-grid">
                 {% for row in parking_rows %}
-                    <div class="d-flex align-items-center mb-3">
-                        <div class="fw-bold me-3" style="width: 70px;">
+                    <div class="d-flex parking-grid-row">
+                        <div class="fw-bold me-3 parking-row-label">
                             Ряд {{ row.row_number }}
                         </div>
 
-                        <div class="d-flex flex-wrap gap-3">
+                        <div class="d-flex flex-wrap parking-space-list">
                             {% for space in row.spaces %}
-                                <div class="parking-space-card border
+                                <div class="parking-space-card
                                     {% if space.is_active %}
-                                        border-success bg-success-subtle
+                                        parking-space-card--active
                                     {% else %}
-                                        border-danger bg-danger-subtle
+                                        parking-space-card--inactive
                                     {% endif %}
                                 ">
-                                    <div class="fw-bold fs-5">
+                                    <div class="parking-space-number">
                                         {{ space.number }}
                                     </div>
 
-                                    <div class="small mb-1">
+                                    <div class="parking-space-meta">
                                         {{ space.space_type.name }}
                                     </div>
 
-                                    <div class="mb-2">
+                                    <div class="mt-2">
                                         {% if space.is_active %}
                                             <span class="badge bg-success">Активне</span>
                                         {% else %}
@@ -59,9 +59,11 @@
                                         {% endif %}
                                     </div>
 
+                                    <div class="parking-space-action">
                                     <a href="{% url 'dashboard:space_edit' space.id %}" class="btn btn-sm btn-outline-primary">
                                         Редагувати
                                     </a>
+                                    </div>
                                 </div>
                             {% endfor %}
                         </div>
@@ -76,13 +78,4 @@
     </div>
 </section>
 
-<style>
-    .parking-space-card {
-        width: 155px;
-        min-height: 135px;
-        border-radius: 12px;
-        padding: 12px;
-        text-align: center;
-    }
-</style>
 {% endblock %}

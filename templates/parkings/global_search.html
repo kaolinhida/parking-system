@@ -50,7 +50,7 @@
                         <div class="text-danger small">{{ form.space_type.errors }}</div>
                     </div>
 
-                    <div class="col-12">
+                    <div class="col-12 d-flex flex-wrap gap-2 stacked-actions">
                         <button type="submit" class="btn btn-primary">
                             Знайти місце
                         </button>
@@ -110,18 +110,22 @@
                                     </div>
 
                                     {% if item.available_spaces %}
-                                        <div class="d-flex flex-wrap gap-3">
+                                        <div class="d-flex flex-wrap parking-space-list">
                                             {% for data in item.available_spaces %}
-                                                <div class="border border-success bg-success-subtle rounded p-3 text-center" style="width: 150px;">
-                                                    <div class="fw-bold fs-5">
+                                                <div class="parking-space-card parking-space-card--available">
+                                                    <div class="parking-space-number">
                                                         {{ data.space.number }}
                                                     </div>
 
-                                                    <div class="small mb-1">
+                                                    <div class="mt-2 mb-2">
+                                                        <span class="badge bg-success parking-space-status">Вільне</span>
+                                                    </div>
+
+                                                    <div class="parking-space-meta">
                                                         {{ data.space.space_type.name }}
                                                     </div>
 
-                                                    <div class="small mb-2">
+                                                    <div class="parking-space-price">
                                                         {% if data.tariff %}
                                                             {{ data.tariff.price_per_hour }} грн/год
                                                         {% else %}

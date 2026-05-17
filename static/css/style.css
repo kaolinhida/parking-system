@@ -1,0 +1,422 @@
+:root {
+    --app-surface: #ffffff;
+    --app-surface-muted: #f6f8fb;
+    --app-border: #e3e8ef;
+    --app-text: #182230;
+    --app-muted: #667085;
+    --app-primary: #2457c5;
+    --app-primary-dark: #1d469e;
+    --app-success: #17875b;
+    --app-danger: #c43d3d;
+    --app-warning: #a15c12;
+    --app-shadow: 0 14px 35px rgba(16, 24, 40, 0.08);
+}
+
+body.app-body {
+    color: var(--app-text);
+    background:
+        linear-gradient(180deg, #f7f9fc 0, #f1f4f8 320px, #f7f9fc 100%);
+}
+
+.app-navbar {
+    box-shadow: 0 8px 24px rgba(16, 24, 40, 0.16);
+}
+
+.navbar .container-fluid {
+    max-width: 1320px;
+}
+
+.navbar-brand {
+    letter-spacing: 0;
+}
+
+.navbar-dark .navbar-nav .nav-link {
+    border-radius: 8px;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+}
+
+.navbar-dark .navbar-nav .nav-link:hover,
+.navbar-dark .navbar-nav .nav-link:focus {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+main > section {
+    padding-top: 3.25rem !important;
+    padding-bottom: 3.25rem !important;
+}
+
+h1,
+.h1 {
+    color: var(--app-text);
+}
+
+h1.fw-bold,
+.display-5.fw-bold {
+    line-height: 1.12;
+}
+
+.text-muted {
+    color: var(--app-muted) !important;
+}
+
+.card {
+    border-radius: 8px;
+}
+
+.card.border-0.shadow-sm,
+.card.shadow.border-0 {
+    border: 1px solid var(--app-border) !important;
+    box-shadow: var(--app-shadow) !important;
+}
+
+.card-body {
+    padding: 1.35rem;
+}
+
+.btn {
+    border-radius: 8px;
+    font-weight: 600;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+.btn-sm {
+    padding: 0.35rem 0.7rem;
+}
+
+.btn-primary {
+    background-color: var(--app-primary);
+    border-color: var(--app-primary);
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+    background-color: var(--app-primary-dark);
+    border-color: var(--app-primary-dark);
+}
+
+.btn-outline-primary {
+    color: var(--app-primary);
+    border-color: #9bb5ef;
+}
+
+.btn-outline-primary:hover,
+.btn-outline-primary:focus {
+    background-color: var(--app-primary);
+    border-color: var(--app-primary);
+}
+
+.btn-outline-secondary {
+    border-color: #c8d0dc;
+    color: #475467;
+}
+
+.btn-outline-secondary:hover,
+.btn-outline-secondary:focus {
+    background-color: #475467;
+    border-color: #475467;
+}
+
+.table-responsive {
+    border-radius: 8px;
+}
+
+.table {
+    --bs-table-bg: transparent;
+    color: var(--app-text);
+}
+
+.table > :not(caption) > * > * {
+    padding: 0.9rem 1rem;
+    border-bottom-color: var(--app-border);
+}
+
+.table thead th {
+    color: #475467;
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.table tbody tr:hover {
+    background: rgba(36, 87, 197, 0.035);
+}
+
+.badge {
+    border-radius: 999px;
+    font-weight: 700;
+    padding: 0.42em 0.72em;
+}
+
+.bg-primary {
+    background-color: var(--app-primary) !important;
+}
+
+.bg-success {
+    background-color: var(--app-success) !important;
+}
+
+.bg-danger {
+    background-color: var(--app-danger) !important;
+}
+
+.bg-info {
+    background-color: #d7efff !important;
+}
+
+.bg-secondary {
+    background-color: #667085 !important;
+}
+
+.alert {
+    border: 1px solid transparent;
+    border-radius: 8px;
+}
+
+.form-control,
+.form-select {
+    border-color: #cfd7e3;
+    border-radius: 8px;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #8aa8ea;
+    box-shadow: 0 0 0 0.2rem rgba(36, 87, 197, 0.15);
+}
+
+.list-group-item {
+    padding-left: 0;
+    padding-right: 0;
+    border-color: var(--app-border);
+}
+
+.stacked-actions {
+    align-items: center;
+}
+
+.entity-card .card-body {
+    display: flex;
+    flex-direction: column;
+}
+
+.entity-card .card-actions {
+    margin-top: auto;
+}
+
+.vehicle-photo,
+.vehicle-photo-placeholder {
+    height: 260px;
+}
+
+.vehicle-photo {
+    object-fit: cover;
+}
+
+.vehicle-photo-placeholder {
+    background: var(--app-surface-muted);
+}
+
+.parking-grid {
+    display: grid;
+    gap: 1rem;
+}
+
+.parking-grid-row {
+    align-items: stretch !important;
+    gap: 1rem;
+}
+
+.parking-row-label {
+    width: 70px;
+    color: #475467;
+    padding-top: 0.85rem;
+}
+
+.parking-space-list {
+    gap: 1rem !important;
+}
+
+.parking-space-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 170px;
+    min-height: 190px;
+    padding: 1rem;
+    overflow: hidden;
+    text-align: left;
+    background: var(--app-surface);
+    border: 1px solid var(--app-border);
+    border-radius: 8px;
+    box-shadow: 0 12px 26px rgba(16, 24, 40, 0.08);
+    transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
+}
+
+.parking-space-card::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 5px;
+    background: var(--app-primary);
+}
+
+.parking-space-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 34px rgba(16, 24, 40, 0.12);
+}
+
+.parking-space-card--available,
+.parking-space-card--active {
+    border-color: rgba(23, 135, 91, 0.28);
+    background: linear-gradient(180deg, #ffffff 0%, #f3fbf7 100%);
+}
+
+.parking-space-card--available::before,
+.parking-space-card--active::before {
+    background: var(--app-success);
+}
+
+.parking-space-card--occupied {
+    border-color: rgba(102, 112, 133, 0.28);
+    background: linear-gradient(180deg, #ffffff 0%, #f7f8fa 100%);
+}
+
+.parking-space-card--occupied::before {
+    background: #667085;
+}
+
+.parking-space-card--inactive {
+    border-color: rgba(196, 61, 61, 0.3);
+    background: linear-gradient(180deg, #ffffff 0%, #fff6f6 100%);
+}
+
+.parking-space-card--inactive::before {
+    background: var(--app-danger);
+}
+
+.parking-space-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 0.8rem;
+    padding-left: 0.15rem;
+}
+
+.parking-space-number {
+    color: var(--app-text);
+    font-size: 1.55rem;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.parking-space-status {
+    white-space: nowrap;
+}
+
+.parking-space-meta {
+    color: #475467;
+    font-size: 0.9rem;
+    line-height: 1.25;
+}
+
+.parking-space-price {
+    margin-top: 0.45rem;
+    color: var(--app-text);
+    font-size: 0.92rem;
+    font-weight: 700;
+}
+
+.parking-space-action {
+    margin-top: auto;
+    padding-top: 0.9rem;
+}
+
+.parking-space-action .btn,
+.parking-space-card > .btn {
+    width: 100%;
+}
+
+.parking-space-card > .btn {
+    margin-top: auto;
+}
+
+#parking-map {
+    height: 350px;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.access-log-message {
+    min-width: 16rem;
+    white-space: normal;
+}
+
+.access-detail-table th {
+    width: 35%;
+    white-space: nowrap;
+}
+
+footer {
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+@media (max-width: 991.98px) {
+    .navbar-dark .navbar-nav .nav-link {
+        padding-left: 0;
+    }
+}
+
+@media (max-width: 575.98px) {
+    main > section {
+        padding-top: 2rem !important;
+        padding-bottom: 2rem !important;
+    }
+
+    .dashboard-actions,
+    .dashboard-actions .btn,
+    .profile-actions,
+    .profile-actions .btn,
+    .profile-actions form,
+    .report-filter-actions .btn {
+        width: 100%;
+    }
+
+    .access-detail-card {
+        padding: 1rem !important;
+    }
+
+    .access-detail-table th {
+        white-space: normal;
+    }
+
+    .access-detail-actions .btn {
+        width: 100%;
+    }
+
+    .stacked-actions,
+    .stacked-actions .btn,
+    .stacked-actions form {
+        width: 100%;
+    }
+
+    .parking-grid-row {
+        flex-direction: column;
+        gap: 0.65rem;
+    }
+
+    .parking-row-label {
+        width: auto;
+        padding-top: 0;
+    }
+
+    .parking-space-list {
+        width: 100%;
+    }
+
+    .parking-space-card {
+        width: min(100%, 170px);
+    }
+}

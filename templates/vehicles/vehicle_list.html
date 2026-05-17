@@ -5,7 +5,7 @@
 {% block content %}
 <section class="py-5">
     <div class="container">
-        <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
             <div>
                 <h1 class="fw-bold mb-1">Мій гараж</h1>
                 <p class="text-muted mb-0">
@@ -22,15 +22,13 @@
             <div class="row g-4">
                 {% for vehicle in vehicles %}
                     <div class="col-md-6 col-lg-4">
-                        <div class="card h-100 border-0 shadow-sm">
+                        <div class="card h-100 border-0 shadow-sm entity-card">
                             {% if vehicle.photo %}
                                 <img src="{{ vehicle.photo.url }}"
-                                     class="card-img-top"
-                                     alt="{{ vehicle }}"
-                                     style="height: 260px; object-fit: cover;">
+                                     class="card-img-top vehicle-photo"
+                                     alt="{{ vehicle }}">
                             {% else %}
-                                <div class="bg-light d-flex align-items-center justify-content-center"
-                                     style="height: 260px;">
+                                <div class="vehicle-photo-placeholder d-flex align-items-center justify-content-center">
                                     <span class="text-muted">Фото не додано</span>
                                 </div>
                             {% endif %}
@@ -54,7 +52,7 @@
                                     <strong>Колір:</strong> {{ vehicle.get_color_display }}
                                 </p>
 
-                                <div class="d-flex gap-2 flex-wrap">
+                                <div class="d-flex gap-2 flex-wrap stacked-actions card-actions">
                                     <a href="{% url 'vehicles:vehicle_edit' vehicle.id %}" class="btn btn-sm btn-outline-primary">
                                         Редагувати
                                     </a>

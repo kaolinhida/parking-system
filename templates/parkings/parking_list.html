@@ -22,7 +22,7 @@
             <div class="row g-4">
                 {% for parking in parkings %}
                     <div class="col-md-6 col-lg-4">
-                        <div class="card border-0 shadow-sm h-100">
+                        <div class="card border-0 shadow-sm h-100 entity-card">
                             <div class="card-body p-4">
                                 <h5 class="fw-bold mb-3">{{ parking.name }}</h5>
 
@@ -45,7 +45,7 @@
                                     {% endif %}
                                 </p>
 
-                                <div class="d-flex gap-2 flex-wrap">
+                                <div class="d-flex gap-2 flex-wrap stacked-actions card-actions">
                                     <a href="{% url 'parkings:parking_detail' parking.id %}" class="btn btn-primary">
                                         Переглянути парковку
                                     </a>
