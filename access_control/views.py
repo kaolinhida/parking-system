@@ -1,7 +1,7 @@
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 from django.core.paginator import Paginator
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 
 from reservations.models import Reservation
@@ -345,4 +345,44 @@ def check_out(request, access_token):
     else:
         messages.success(request, 'Виїзд підтверджено. Бронювання завершено без доплати.')
 
+    return redirect('access_control:reservation_detail', access_token=access_token)
+
+
+@staff_member_required
+def mark_paid(request, access_token):
+    reservation = get_object_or_404(Reservation, access_token=access_token)
+
+    if request.method != 'POST':
+        return redirect('access_control:reservation_detail', access_token=access_token)
+
+    if reservation.is_paid:
+        messages.info(request, 'Базову вартість уже позначено як оплачену.')
+        return redirect('access_control:reservation_detail', access_token=access_token)
+
+    reservation.is_paid = True
+    reservation.save(update_fields=['is_paid', 'paid_at', 'updated_at'])
+
+    messages.success(request, 'Базову вартість бронювання позначено як оплачену.')
+    return redirect('access_control:reservation_detail', access_token=access_token)
+
+
+@staff_member_required
+def mark_overtime_paid(request, access_token):
+    reservation = get_object_or_404(Reservation, access_token=access_token)
+
+    if request.method != 'POST':
+        return redirect('access_control:reservation_detail', access_token=access_token)
+
+    if reservation.overtime_fee <= 0:
+        messages.info(request, 'Для цього бронювання доплата не потрібна.')
+        return redirect('access_control:reservation_detail', access_token=access_token)
+
+    if reservation.overtime_is_paid:
+        messages.info(request, 'Доплату вже позначено як оплачену.')
+        return redirect('access_control:reservation_detail', access_token=access_token)
+
+    reservation.overtime_is_paid = True
+    reservation.save(update_fields=['overtime_is_paid', 'overtime_paid_at', 'updated_at'])
+
+    messages.success(request, 'Доплату за перевищення часу позначено як оплачену.')
     return redirect('access_control:reservation_detail', access_token=access_token)

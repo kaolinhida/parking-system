@@ -94,6 +94,7 @@
                                 <th>Авто</th>
                                 <th>Час</th>
                                 <th>Статус</th>
+                                <th>Оплата</th>
                                 <th>Вартість</th>
                                 <th>Борг</th>
                                 <th class="text-nowrap">Дія</th>
@@ -134,6 +135,18 @@
                                             <span class="badge bg-secondary">
                                                 {{ reservation.get_status_display }}
                                             </span>
+                                        {% endif %}
+                                    </td>
+
+                                    <td>
+                                        {% if reservation.overtime_fee and not reservation.overtime_is_paid %}
+                                            <span class="badge bg-danger">Доплата не оплачена</span>
+                                        {% elif reservation.is_paid %}
+                                            <span class="badge bg-success">Оплачено</span>
+                                        {% elif reservation.status == 'cancelled' %}
+                                            <span class="badge bg-secondary">Оплата очікується</span>
+                                        {% else %}
+                                            <span class="badge bg-warning text-dark">Не оплачено</span>
                                         {% endif %}
                                     </td>
 

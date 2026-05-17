@@ -153,6 +153,49 @@
                                             {% endif %}
                                         </td>
                                     </tr>
+
+                                    <tr>
+                                        <th>Оплата базової вартості</th>
+                                        <td>
+                                            {% if reservation.is_paid %}
+                                                <span class="badge bg-success">Оплачено</span>
+                                                {% if reservation.paid_at %}
+                                                    <div class="small text-muted">
+                                                        {{ reservation.paid_at|date:"d.m.Y H:i" }}
+                                                    </div>
+                                                {% endif %}
+                                            {% else %}
+                                                <span class="badge bg-warning text-dark">Не оплачено</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <th>Оплата доплати</th>
+                                        <td>
+                                            {% if reservation.overtime_fee %}
+                                                {% if reservation.overtime_is_paid %}
+                                                    <span class="badge bg-success">Оплачено</span>
+                                                    {% if reservation.overtime_paid_at %}
+                                                        <div class="small text-muted">
+                                                            {{ reservation.overtime_paid_at|date:"d.m.Y H:i" }}
+                                                        </div>
+                                                    {% endif %}
+                                                {% else %}
+                                                    <span class="badge bg-danger">Доплата не оплачена</span>
+                                                {% endif %}
+                                            {% else %}
+                                                <span class="badge bg-secondary">Не потрібна</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+
+                                    {% if reservation.payment_note %}
+                                        <tr>
+                                            <th>Примітка щодо оплати</th>
+                                            <td>{{ reservation.payment_note }}</td>
+                                        </tr>
+                                    {% endif %}
                                 </tbody>
                             </table>
                         </div>

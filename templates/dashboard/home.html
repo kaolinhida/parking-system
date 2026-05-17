@@ -189,6 +189,7 @@
                                             <th>Парковка</th>
                                             <th>Місце</th>
                                             <th>Статус</th>
+                                            <th>Оплата</th>
                                             <th>Сума</th>
                                         </tr>
                                     </thead>
@@ -212,6 +213,17 @@
                                                         <span class="badge bg-secondary">
                                                             {{ reservation.get_status_display }}
                                                         </span>
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    {% if reservation.overtime_fee and not reservation.overtime_is_paid %}
+                                                        <span class="badge bg-danger">Доплата не оплачена</span>
+                                                    {% elif reservation.is_paid %}
+                                                        <span class="badge bg-success">Оплачено</span>
+                                                    {% elif reservation.status == 'cancelled' %}
+                                                        <span class="badge bg-secondary">Не потрібно</span>
+                                                    {% else %}
+                                                        <span class="badge bg-warning text-dark">Не оплачено</span>
                                                     {% endif %}
                                                 </td>
                                                 <td>

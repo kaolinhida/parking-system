@@ -85,6 +85,33 @@ class Reservation(models.Model):
         verbose_name='Фінальна вартість'
     )
 
+    is_paid = models.BooleanField(
+        default=False,
+        verbose_name='Базову вартість оплачено'
+    )
+
+    paid_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name='Дата оплати базової вартості'
+    )
+
+    overtime_is_paid = models.BooleanField(
+        default=False,
+        verbose_name='Доплату оплачено'
+    )
+
+    overtime_paid_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name='Дата оплати доплати'
+    )
+
+    payment_note = models.TextField(
+        blank=True,
+        verbose_name='Примітка щодо оплати'
+    )
+
     status = models.CharField(
         max_length=20,
         choices=STATUS_CHOICES,
@@ -190,5 +217,15 @@ class Reservation(models.Model):
 
         if self.price_per_hour and self.start_time and self.end_time:
             self.total_price = self.calculate_total_price()
+
+        if self.is_paid and not self.paid_at:
+            self.paid_at = timezone.now()
+        elif not self.is_paid:
+            self.paid_at = None
+
+        if self.overtime_is_paid and not self.overtime_paid_at:
+            self.overtime_paid_at = timezone.now()
+        elif not self.overtime_is_paid:
+            self.overtime_paid_at = None
 
         super().save(*args, **kwargs)

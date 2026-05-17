@@ -11,4 +11,6 @@ urlpatterns = [
     path('reservation/<uuid:access_token>/', views.reservation_detail, name='reservation_detail'),
     path('reservation/<uuid:access_token>/check-in/', views.check_in, name='check_in'),
     path('reservation/<uuid:access_token>/check-out/', views.check_out, name='check_out'),
+    path('reservation/<uuid:access_token>/mark-paid/', views.mark_paid, name='mark_paid'),
+    path('reservation/<uuid:access_token>/mark-overtime-paid/', views.mark_overtime_paid, name='mark_overtime_paid'),
 ]

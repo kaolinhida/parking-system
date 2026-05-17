@@ -130,6 +130,97 @@
                     </table>
                 </div>
 
+                <div class="card border-0 shadow-sm mt-4">
+                    <div class="card-body">
+                        <h5 class="fw-bold mb-3">Оплата</h5>
+
+                        <div class="table-responsive">
+                            <table class="table mb-0">
+                                <tbody>
+                                    <tr>
+                                        <th>Базова вартість</th>
+                                        <td>{{ reservation.total_price }} грн</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Статус базової оплати</th>
+                                        <td>
+                                            {% if reservation.is_paid %}
+                                                <span class="badge bg-success">Оплачено</span>
+                                                {% if reservation.paid_at %}
+                                                    <div class="small text-muted">
+                                                        {{ reservation.paid_at|date:"d.m.Y H:i" }}
+                                                    </div>
+                                                {% endif %}
+                                            {% else %}
+                                                <span class="badge bg-warning text-dark">Не оплачено</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Доплата</th>
+                                        <td>
+                                            {% if overtime_fee %}
+                                                {{ overtime_fee }} грн
+                                            {% else %}
+                                                —
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Статус доплати</th>
+                                        <td>
+                                            {% if reservation.overtime_fee %}
+                                                {% if reservation.overtime_is_paid %}
+                                                    <span class="badge bg-success">Оплачено</span>
+                                                    {% if reservation.overtime_paid_at %}
+                                                        <div class="small text-muted">
+                                                            {{ reservation.overtime_paid_at|date:"d.m.Y H:i" }}
+                                                        </div>
+                                                    {% endif %}
+                                                {% else %}
+                                                    <span class="badge bg-danger">Не оплачено</span>
+                                                {% endif %}
+                                            {% else %}
+                                                <span class="badge bg-secondary">Не потрібна</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Фінальна сума</th>
+                                        <td><strong>{{ final_price }} грн</strong></td>
+                                    </tr>
+                                    {% if reservation.payment_note %}
+                                        <tr>
+                                            <th>Примітка</th>
+                                            <td>{{ reservation.payment_note }}</td>
+                                        </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="d-flex flex-wrap gap-2 mt-3 access-detail-actions">
+                            {% if not reservation.is_paid %}
+                                <form method="post" action="{% url 'access_control:mark_paid' reservation.access_token %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-outline-success">
+                                        Позначити основну оплату
+                                    </button>
+                                </form>
+                            {% endif %}
+
+                            {% if reservation.overtime_fee and not reservation.overtime_is_paid %}
+                                <form method="post" action="{% url 'access_control:mark_overtime_paid' reservation.access_token %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-outline-primary">
+                                        Позначити доплату оплаченою
+                                    </button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
                 <div class="mt-4 access-detail-actions">
                     {% if can_check_in %}
                         <div class="alert alert-success">
