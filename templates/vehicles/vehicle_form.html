@@ -1,6 +1,12 @@
 {% extends 'base.html' %}
 
-{% block title %}Додати авто | Parking System{% endblock %}
+{% block title %}
+    {% if is_edit %}
+        Редагувати авто | Parking System
+    {% else %}
+        Додати авто | Parking System
+    {% endif %}
+{% endblock %}
 
 {% block content %}
 <section class="py-5">
@@ -12,10 +18,17 @@
                         ← Назад до гаража
                     </a>
 
-                    <h1 class="fw-bold mt-3">Додати автомобіль</h1>
-                    <p class="text-muted mb-0">
-                        Заповніть дані автомобіля, щоб використовувати його під час бронювання.
-                    </p>
+                    {% if is_edit %}
+                        <h1 class="fw-bold mt-3">Редагувати автомобіль</h1>
+                        <p class="text-muted mb-0">
+                            Змініть дані автомобіля та збережіть оновлення.
+                        </p>
+                    {% else %}
+                        <h1 class="fw-bold mt-3">Додати автомобіль</h1>
+                        <p class="text-muted mb-0">
+                            Заповніть дані автомобіля, щоб використовувати його під час бронювання.
+                        </p>
+                    {% endif %}
                 </div>
 
                 <div class="card border-0 shadow-sm">
@@ -68,15 +81,31 @@
 
                                 <div class="col-12">
                                     <label class="form-label">{{ form.photo.label }}</label>
+
+                                    {% if is_edit and vehicle.photo %}
+                                        <div class="mb-2">
+                                            <img src="{{ vehicle.photo.url }}"
+                                                 alt="{{ vehicle }}"
+                                                 class="img-thumbnail"
+                                                 style="max-height: 180px;">
+                                        </div>
+                                    {% endif %}
+
                                     {{ form.photo }}
                                     <div class="text-danger small">{{ form.photo.errors }}</div>
                                 </div>
                             </div>
 
                             <div class="mt-4">
-                                <button type="submit" class="btn btn-primary">
-                                    Додати автомобіль
-                                </button>
+                                {% if is_edit %}
+                                    <button type="submit" class="btn btn-primary">
+                                        Зберегти зміни
+                                    </button>
+                                {% else %}
+                                    <button type="submit" class="btn btn-primary">
+                                        Додати автомобіль
+                                    </button>
+                                {% endif %}
 
                                 <a href="{% url 'vehicles:vehicle_list' %}" class="btn btn-outline-secondary">
                                     Скасувати
