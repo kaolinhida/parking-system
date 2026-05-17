@@ -5,6 +5,7 @@ from decimal import Decimal
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils import timezone
 
 from parkings.models import ParkingSpace, Tariff
 
@@ -66,7 +67,22 @@ class Reservation(models.Model):
     total_price = models.DecimalField(
         max_digits=10,
         decimal_places=2,
-        verbose_name='Загальна вартість'
+        verbose_name='Вартість бронювання'
+    )
+
+    overtime_fee = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=0,
+        verbose_name='Доплата за перевищення часу'
+    )
+
+    final_price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        verbose_name='Фінальна вартість'
     )
 
     status = models.CharField(
@@ -118,6 +134,27 @@ class Reservation(models.Model):
 
     def calculate_total_price(self):
         return Decimal(self.duration_hours()) * self.price_per_hour
+
+    def overtime_hours(self, reference_time=None):
+        if not self.end_time:
+            return 0
+
+        if reference_time is None:
+            reference_time = self.check_out_time or timezone.now()
+
+        if reference_time <= self.end_time:
+            return 0
+
+        duration = reference_time - self.end_time
+        hours = duration.total_seconds() / 3600
+
+        return max(1, math.ceil(hours))
+
+    def calculate_overtime_fee(self, reference_time=None):
+        return Decimal(self.overtime_hours(reference_time)) * self.price_per_hour
+
+    def calculate_final_price(self, reference_time=None):
+        return self.total_price + self.calculate_overtime_fee(reference_time)
 
     def clean(self):
         if self.start_time and self.end_time and self.end_time <= self.start_time:

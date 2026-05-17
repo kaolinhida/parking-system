@@ -75,6 +75,33 @@
                                 {% endif %}
                             </td>
                         </tr>
+                        <tr>
+    <th>Вартість бронювання</th>
+    <td>{{ reservation.total_price }} грн</td>
+</tr>
+
+<tr>
+    <th>Доплата за перевищення часу</th>
+    <td>
+        {% if overtime_fee %}
+            <span class="text-danger fw-bold">{{ overtime_fee }} грн</span>
+            {% if overtime_hours %}
+                <div class="small text-muted">
+                    {{ overtime_hours }} год. понад заброньований час
+                </div>
+            {% endif %}
+        {% else %}
+            —
+        {% endif %}
+    </td>
+</tr>
+
+<tr>
+    <th>Фінальна вартість</th>
+    <td>
+        <strong>{{ final_price }} грн</strong>
+    </td>
+</tr>  
                     </tbody>
                 </table>
 

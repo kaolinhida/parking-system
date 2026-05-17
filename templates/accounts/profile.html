@@ -103,9 +103,18 @@
                         <tbody>
                             {% for reservation in reservations %}
                                 <tr>
-                                    <td>{{ reservation.parking_space.parking_lot.name }}</td>
-                                    <td>{{ reservation.parking_space.number }}</td>
-                                    <td>{{ reservation.car_number }}</td>
+                                    <td>
+                                        {{ reservation.parking_space.parking_lot.name }}
+                                    </td>
+
+                                    <td>
+                                        {{ reservation.parking_space.number }}
+                                    </td>
+
+                                    <td>
+                                        {{ reservation.car_number }}
+                                    </td>
+
                                     <td>
                                         {{ reservation.start_time|date:"d.m.Y H:i" }}
                                         —
@@ -122,40 +131,57 @@
                                         {% elif reservation.status == 'completed' %}
                                             <span class="badge bg-success">Завершене</span>
                                         {% else %}
-                                            <span class="badge bg-secondary">{{ reservation.get_status_display }}</span>
+                                            <span class="badge bg-secondary">
+                                                {{ reservation.get_status_display }}
+                                            </span>
                                         {% endif %}
                                     </td>
 
-                                    <td>{{ reservation.total_price }} грн</td>
+                                    <td>
+                                        {% if reservation.final_price_display %}
+                                            <strong>{{ reservation.final_price_display }} грн</strong>
+
+                                            {% if reservation.overtime_fee_display %}
+                                                <div class="small text-muted">
+                                                    Базова: {{ reservation.total_price }} грн
+                                                </div>
+                                            {% endif %}
+                                        {% else %}
+                                            <strong>{{ reservation.total_price }} грн</strong>
+                                        {% endif %}
+                                    </td>
 
                                     <td>
                                         {% if reservation.overtime_fee_display %}
                                             <span class="text-danger fw-bold">
                                                 {{ reservation.overtime_fee_display }} грн
                                             </span>
-                                            <div class="small text-muted">
-                                                {{ reservation.overtime_hours_display }} год. понад час
-                                            </div>
+
+                                            {% if reservation.overtime_hours_display %}
+                                                <div class="small text-muted">
+                                                    {{ reservation.overtime_hours_display }} год. понад час
+                                                </div>
+                                            {% endif %}
                                         {% else %}
                                             —
                                         {% endif %}
                                     </td>
 
                                     <td>
-                                        <a href="{% url 'reservations:reservation_qr_page' reservation.id %}" class="btn btn-sm btn-outline-primary mb-1">
-                                            QR-код
-                                        </a>
+                                        <div class="d-flex flex-column gap-1 align-items-start">
+                                            <a href="{% url 'reservations:reservation_qr_page' reservation.id %}" class="btn btn-sm btn-outline-primary">
+                                                QR-код
+                                            </a>
 
-                                        {% if reservation.status == 'active' %}
-                                            <form method="post" action="{% url 'reservations:cancel_reservation' reservation.id %}">
-                                                {% csrf_token %}
-                                                <button type="submit" class="btn btn-sm btn-outline-danger">
-                                                    Скасувати
-                                                </button>
-                                            </form>
-                                        {% else %}
-                                            —
-                                        {% endif %}
+                                            {% if reservation.status == 'active' %}
+                                                <form method="post" action="{% url 'reservations:cancel_reservation' reservation.id %}">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                        Скасувати
+                                                    </button>
+                                                </form>
+                                            {% endif %}
+                                        </div>
                                     </td>
                                 </tr>
                             {% endfor %}

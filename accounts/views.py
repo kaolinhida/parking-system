@@ -3,6 +3,7 @@ import math
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
+from django.db.models import F
 from django.utils import timezone
 
 from reservations.models import Reservation
@@ -36,7 +37,12 @@ def profile(request):
         user=request.user,
         status=Reservation.STATUS_ACTIVE,
         end_time__lt=now,
-    ).update(status=Reservation.STATUS_COMPLETED)
+        check_in_time__isnull=True,
+    ).update(
+        status=Reservation.STATUS_COMPLETED,
+        final_price=F('total_price'),
+        overtime_fee=0
+    )
 
     reservations = (
         Reservation.objects
@@ -57,18 +63,22 @@ def profile(request):
 
     for reservation in reservations:
         reservation.overtime_hours_display = 0
-        reservation.overtime_fee_display = 0
+        reservation.overtime_fee_display = reservation.overtime_fee
+        reservation.final_price_display = reservation.final_price or reservation.total_price
 
         if (
             reservation.status == Reservation.STATUS_CHECKED_IN
             and reservation.end_time
             and now > reservation.end_time
         ):
-            duration = now - reservation.end_time
-            overtime_seconds = duration.total_seconds()
-            overtime_hours = math.ceil(overtime_seconds / 3600)
-            reservation.overtime_hours_display = max(1, overtime_hours)
-            reservation.overtime_fee_display = reservation.overtime_hours_display * reservation.price_per_hour
+            reservation.overtime_hours_display = reservation.overtime_hours(now)
+            reservation.overtime_fee_display = reservation.calculate_overtime_fee(now)
+            reservation.final_price_display = reservation.total_price + reservation.overtime_fee_display
+
+        if reservation.status == Reservation.STATUS_COMPLETED:
+            reservation.overtime_hours_display = reservation.overtime_hours(reservation.check_out_time)
+            reservation.overtime_fee_display = reservation.overtime_fee
+            reservation.final_price_display = reservation.final_price or reservation.total_price
 
     return render(request, 'accounts/profile.html', {
         'reservations': reservations,

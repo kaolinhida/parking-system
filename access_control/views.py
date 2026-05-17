@@ -47,11 +47,28 @@ def reservation_detail(request, access_token):
         and reservation.check_out_time is None
     )
 
+    overtime_hours = 0
+    overtime_fee = reservation.overtime_fee
+    final_price = reservation.final_price or reservation.total_price
+
+    if reservation.status == Reservation.STATUS_CHECKED_IN and now > reservation.end_time:
+        overtime_hours = reservation.overtime_hours(now)
+        overtime_fee = reservation.calculate_overtime_fee(now)
+        final_price = reservation.total_price + overtime_fee
+
+    if reservation.status == Reservation.STATUS_COMPLETED:
+        overtime_hours = reservation.overtime_hours(reservation.check_out_time)
+        overtime_fee = reservation.overtime_fee
+        final_price = reservation.final_price or reservation.total_price + overtime_fee
+
     return render(request, 'access_control/reservation_detail.html', {
         'reservation': reservation,
         'now': now,
         'can_check_in': can_check_in,
         'can_check_out': can_check_out,
+        'overtime_hours': overtime_hours,
+        'overtime_fee': overtime_fee,
+        'final_price': final_price,
     })
 
 
@@ -99,9 +116,23 @@ def check_out(request, access_token):
         messages.error(request, 'Виїзд уже було підтверджено раніше.')
         return redirect('access_control:reservation_detail', access_token=access_token)
 
-    reservation.check_out_time = timezone.now()
+    now = timezone.now()
+
+    overtime_fee = reservation.calculate_overtime_fee(now)
+    final_price = reservation.total_price + overtime_fee
+
+    reservation.check_out_time = now
+    reservation.overtime_fee = overtime_fee
+    reservation.final_price = final_price
     reservation.status = Reservation.STATUS_COMPLETED
     reservation.save()
 
-    messages.success(request, 'Виїзд підтверджено. Бронювання завершено.')
+    if overtime_fee > 0:
+        messages.warning(
+            request,
+            f'Виїзд підтверджено. За перевищення часу нараховано доплату: {overtime_fee} грн.'
+        )
+    else:
+        messages.success(request, 'Виїзд підтверджено. Бронювання завершено без доплати.')
+
     return redirect('access_control:reservation_detail', access_token=access_token)
