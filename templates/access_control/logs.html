@@ -17,8 +17,66 @@
             </p>
         </div>
 
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+                <h5 class="fw-bold mb-3">Фільтри журналу</h5>
+
+                <form method="get" class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label">{{ filter_form.date_from.label }}</label>
+                        {{ filter_form.date_from }}
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">{{ filter_form.date_to.label }}</label>
+                        {{ filter_form.date_to }}
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">{{ filter_form.action.label }}</label>
+                        {{ filter_form.action }}
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">{{ filter_form.result.label }}</label>
+                        {{ filter_form.result }}
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">{{ filter_form.car_number.label }}</label>
+                        {{ filter_form.car_number }}
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">{{ filter_form.parking_lot.label }}</label>
+                        {{ filter_form.parking_lot }}
+                    </div>
+
+                    <div class="col-12 d-flex flex-wrap gap-2 stacked-actions">
+                        <button type="submit" class="btn btn-primary">
+                            Застосувати фільтри
+                        </button>
+
+                        <a href="{% url 'access_control:logs' %}" class="btn btn-outline-secondary">
+                            Скинути
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
         {% if logs %}
             <div class="card border-0 shadow-sm">
+                <div class="card-body border-bottom">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <h5 class="fw-bold mb-0">Записи журналу</h5>
+
+                        <span class="text-muted small">
+                            Знайдено: {{ page_obj.paginator.count }}
+                        </span>
+                    </div>
+                </div>
+
                 <div class="table-responsive">
                     <table class="table align-middle mb-0 text-nowrap">
                         <thead class="table-light">
@@ -94,9 +152,61 @@
                     </table>
                 </div>
             </div>
+
+            {% if page_obj.paginator.num_pages > 1 %}
+                <nav class="mt-4" aria-label="Навігація сторінками журналу доступу">
+                    <ul class="pagination justify-content-center flex-wrap gap-1 mb-0">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?{% if query_params %}{{ query_params }}&{% endif %}page=1">
+                                    Перша
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?{% if query_params %}{{ query_params }}&{% endif %}page={{ page_obj.previous_page_number }}">
+                                    Попередня
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link">Перша</span>
+                            </li>
+                            <li class="page-item disabled">
+                                <span class="page-link">Попередня</span>
+                            </li>
+                        {% endif %}
+
+                        <li class="page-item active" aria-current="page">
+                            <span class="page-link">
+                                {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+                            </span>
+                        </li>
+
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?{% if query_params %}{{ query_params }}&{% endif %}page={{ page_obj.next_page_number }}">
+                                    Наступна
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?{% if query_params %}{{ query_params }}&{% endif %}page={{ page_obj.paginator.num_pages }}">
+                                    Остання
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link">Наступна</span>
+                            </li>
+                            <li class="page-item disabled">
+                                <span class="page-link">Остання</span>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
         {% else %}
             <div class="alert alert-info">
-                Журнал доступу поки порожній.
+                За вибраними фільтрами записи журналу не знайдено.
             </div>
         {% endif %}
     </div>

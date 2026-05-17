@@ -1,10 +1,11 @@
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
+from django.core.paginator import Paginator
 from django.shortcuts import redirect, render
 from django.utils import timezone
 
 from reservations.models import Reservation
-from .forms import AccessCodeForm
+from .forms import AccessCodeForm, AccessLogFilterForm
 from .models import AccessLog
 
 
@@ -36,6 +37,8 @@ def access_control_home(request):
 
 @staff_member_required
 def access_logs(request):
+    filter_form = AccessLogFilterForm(request.GET or None)
+
     logs = (
         AccessLog.objects
         .select_related(
@@ -44,11 +47,53 @@ def access_logs(request):
             'reservation__parking_space__parking_lot',
             'performed_by',
         )
-        .order_by('-created_at')[:100]
+        .order_by('-created_at')
     )
 
+    if filter_form.is_valid():
+        date_from = filter_form.cleaned_data.get('date_from')
+        date_to = filter_form.cleaned_data.get('date_to')
+        action = filter_form.cleaned_data.get('action')
+        result = filter_form.cleaned_data.get('result')
+        car_number = filter_form.cleaned_data.get('car_number')
+        parking_lot = filter_form.cleaned_data.get('parking_lot')
+
+        if date_from:
+            start_at = timezone.make_aware(
+                timezone.datetime.combine(date_from, timezone.datetime.min.time())
+            )
+            logs = logs.filter(created_at__gte=start_at)
+
+        if date_to:
+            end_at = timezone.make_aware(
+                timezone.datetime.combine(date_to, timezone.datetime.max.time())
+            )
+            logs = logs.filter(created_at__lte=end_at)
+
+        if action:
+            logs = logs.filter(action=action)
+
+        if result:
+            logs = logs.filter(result=result)
+
+        if car_number:
+            logs = logs.filter(reservation__car_number__icontains=car_number)
+
+        if parking_lot:
+            logs = logs.filter(
+                reservation__parking_space__parking_lot=parking_lot
+            )
+
+    paginator = Paginator(logs, 20)
+    page_obj = paginator.get_page(request.GET.get('page'))
+    query_params = request.GET.copy()
+    query_params.pop('page', None)
+
     return render(request, 'access_control/logs.html', {
-        'logs': logs,
+        'filter_form': filter_form,
+        'logs': page_obj,
+        'page_obj': page_obj,
+        'query_params': query_params.urlencode(),
     })
 
 
