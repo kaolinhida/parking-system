@@ -5,46 +5,57 @@
 {% block content %}
 <section class="py-5">
     <div class="container">
-        <div class="mb-4">
-            <h1 class="fw-bold">Доступні парковки</h1>
-            <p class="text-muted">
-                Оберіть парковку, щоб переглянути схему паркомісць та поточний стан місць.
-            </p>
+        <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+            <div>
+                <h1 class="fw-bold mb-1">Доступні парковки</h1>
+                <p class="text-muted mb-0">
+                    Оберіть парковку або скористайтеся пошуком доступного місця.
+                </p>
+            </div>
+
+            <a href="{% url 'parkings:global_search' %}" class="btn btn-primary">
+                Знайти місце
+            </a>
         </div>
 
         {% if parkings %}
             <div class="row g-4">
                 {% for parking in parkings %}
                     <div class="col-md-6 col-lg-4">
-                        <div class="card h-100 shadow-sm border-0">
-                            <div class="card-body">
-                                <h5 class="card-title fw-bold">{{ parking.name }}</h5>
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body p-4">
+                                <h5 class="fw-bold mb-3">{{ parking.name }}</h5>
 
-                                <p class="card-text text-muted mb-2">
+                                <p class="text-muted mb-2">
                                     {{ parking.address }}
                                 </p>
 
                                 {% if parking.description %}
-                                    <p class="card-text">
+                                    <p class="mb-3">
                                         {{ parking.description }}
                                     </p>
                                 {% endif %}
 
-                                <p class="small text-muted mb-3">
-                                    Кількість місць: {{ parking.spaces_count }}
+                                <p class="text-muted mb-3">
+                                    Кількість місць:
+                                    {% if parking.spaces_count %}
+                                        {{ parking.spaces_count }}
+                                    {% else %}
+                                        0
+                                    {% endif %}
                                 </p>
 
                                 <div class="d-flex gap-2 flex-wrap">
-    <a href="{% url 'parkings:parking_detail' parking.id %}" class="btn btn-primary">
-        Переглянути парковку
-    </a>
+                                    <a href="{% url 'parkings:parking_detail' parking.id %}" class="btn btn-primary">
+                                        Переглянути парковку
+                                    </a>
 
-    {% if parking.has_coordinates %}
-        <a href="{{ parking.google_maps_url }}" target="_blank" class="btn btn-outline-success">
-            Google Maps
-        </a>
-    {% endif %}
-</div>
+                                    {% if parking.has_coordinates %}
+                                        <a href="{{ parking.google_maps_url }}" target="_blank" class="btn btn-outline-success">
+                                            Google Maps
+                                        </a>
+                                    {% endif %}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -52,7 +63,7 @@
             </div>
         {% else %}
             <div class="alert alert-info">
-                Наразі активних парковок немає.
+                Наразі немає доступних парковок.
             </div>
         {% endif %}
     </div>

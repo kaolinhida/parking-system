@@ -1,4 +1,7 @@
+from datetime import datetime
+
 from django import forms
+from django.utils import timezone
 
 from .models import ParkingSpaceType
 
@@ -40,12 +43,96 @@ class ParkingAvailabilityForm(forms.Form):
 
     def clean(self):
         cleaned_data = super().clean()
+
+        selected_date = cleaned_data.get('date')
         start_time = cleaned_data.get('start_time')
         end_time = cleaned_data.get('end_time')
 
-        if start_time and end_time and end_time <= start_time:
-            raise forms.ValidationError(
-                'Час завершення має бути пізніше часу початку.'
+        if selected_date and start_time and end_time:
+            start_datetime = timezone.make_aware(
+                datetime.combine(selected_date, start_time)
             )
+            end_datetime = timezone.make_aware(
+                datetime.combine(selected_date, end_time)
+            )
+
+            if end_datetime <= start_datetime:
+                raise forms.ValidationError(
+                    'Час завершення має бути пізніше часу початку.'
+                )
+
+            if start_datetime < timezone.now():
+                raise forms.ValidationError(
+                    'Не можна шукати місця на минулий час.'
+                )
+
+            cleaned_data['start_datetime'] = start_datetime
+            cleaned_data['end_datetime'] = end_datetime
+
+        return cleaned_data
+
+
+class GlobalParkingSearchForm(forms.Form):
+    date = forms.DateField(
+        label='Дата',
+        widget=forms.DateInput(attrs={
+            'type': 'date',
+            'class': 'form-control',
+        })
+    )
+
+    start_time = forms.TimeField(
+        label='Час початку',
+        widget=forms.TimeInput(attrs={
+            'type': 'time',
+            'class': 'form-control',
+        })
+    )
+
+    end_time = forms.TimeField(
+        label='Час завершення',
+        widget=forms.TimeInput(attrs={
+            'type': 'time',
+            'class': 'form-control',
+        })
+    )
+
+    space_type = forms.ModelChoiceField(
+        label='Тип паркомісця',
+        queryset=ParkingSpaceType.objects.filter(is_active=True),
+        required=False,
+        empty_label='Усі типи',
+        widget=forms.Select(attrs={
+            'class': 'form-select',
+        })
+    )
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        selected_date = cleaned_data.get('date')
+        start_time = cleaned_data.get('start_time')
+        end_time = cleaned_data.get('end_time')
+
+        if selected_date and start_time and end_time:
+            start_datetime = timezone.make_aware(
+                datetime.combine(selected_date, start_time)
+            )
+            end_datetime = timezone.make_aware(
+                datetime.combine(selected_date, end_time)
+            )
+
+            if end_datetime <= start_datetime:
+                raise forms.ValidationError(
+                    'Час завершення має бути пізніше часу початку.'
+                )
+
+            if start_datetime < timezone.now():
+                raise forms.ValidationError(
+                    'Не можна шукати місця на минулий час.'
+                )
+
+            cleaned_data['start_datetime'] = start_datetime
+            cleaned_data['end_datetime'] = end_datetime
 
         return cleaned_data

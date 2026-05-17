@@ -6,7 +6,9 @@ from django.utils import timezone
 
 from reservations.models import Reservation
 from .forms import ParkingAvailabilityForm
-from .models import ParkingLot, Tariff
+from .models import ParkingLot, ParkingSpace, Tariff
+from django.db.models import Q
+from .forms import GlobalParkingSearchForm
 
 
 def parking_list(request):
@@ -110,4 +112,95 @@ def parking_detail(request, parking_id):
         'selected_start': selected_start,
         'selected_end': selected_end,
         'selected_space_type': selected_space_type,
+    })
+
+def parking_global_search(request):
+    form = GlobalParkingSearchForm(request.GET or None)
+    search_performed = False
+    results = []
+
+    if form.is_valid():
+        search_performed = True
+
+        start_datetime = form.cleaned_data['start_datetime']
+        end_datetime = form.cleaned_data['end_datetime']
+        selected_space_type = form.cleaned_data.get('space_type')
+
+        parkings = ParkingLot.objects.filter(is_active=True).order_by('name')
+
+        for parking in parkings:
+            spaces = (
+                ParkingSpace.objects
+                .filter(parking_lot=parking)
+                .select_related('space_type')
+                .order_by('row', 'column')
+            )
+
+            if selected_space_type:
+                spaces = spaces.filter(space_type=selected_space_type)
+
+            available_spaces = []
+            occupied_spaces = []
+            inactive_spaces = []
+
+            for space in spaces:
+                tariff = (
+                    Tariff.objects
+                    .filter(
+                        parking_lot=parking,
+                        space_type=space.space_type,
+                        is_active=True
+                    )
+                    .first()
+                )
+
+                if not space.is_active:
+                    inactive_spaces.append({
+                        'space': space,
+                        'tariff': tariff,
+                    })
+                    continue
+
+                overlapping_active_reservation_exists = Reservation.objects.filter(
+                    parking_space=space,
+                    status=Reservation.STATUS_ACTIVE,
+                    start_time__lt=end_datetime,
+                    end_time__gt=start_datetime,
+                ).exists()
+
+                checked_in_reservation_exists = Reservation.objects.filter(
+                    parking_space=space,
+                    status=Reservation.STATUS_CHECKED_IN,
+                    check_out_time__isnull=True,
+                ).exists()
+
+                is_occupied = (
+                    overlapping_active_reservation_exists
+                    or checked_in_reservation_exists
+                )
+
+                space_data = {
+                    'space': space,
+                    'tariff': tariff,
+                }
+
+                if is_occupied:
+                    occupied_spaces.append(space_data)
+                else:
+                    available_spaces.append(space_data)
+
+            results.append({
+                'parking': parking,
+                'available_spaces': available_spaces,
+                'occupied_spaces': occupied_spaces,
+                'inactive_spaces': inactive_spaces,
+                'available_count': len(available_spaces),
+                'occupied_count': len(occupied_spaces),
+                'inactive_count': len(inactive_spaces),
+            })
+
+    return render(request, 'parkings/global_search.html', {
+        'form': form,
+        'search_performed': search_performed,
+        'results': results,
     })
