@@ -39,12 +39,14 @@ def profile(request):
     )
 
     active_count = reservations.filter(status=Reservation.STATUS_ACTIVE).count()
+    checked_in_count = reservations.filter(status=Reservation.STATUS_CHECKED_IN).count()
     cancelled_count = reservations.filter(status=Reservation.STATUS_CANCELLED).count()
     completed_count = reservations.filter(status=Reservation.STATUS_COMPLETED).count()
 
     return render(request, 'accounts/profile.html', {
         'reservations': reservations,
         'active_count': active_count,
+        'checked_in_count': checked_in_count,
         'cancelled_count': cancelled_count,
         'completed_count': completed_count,
     })

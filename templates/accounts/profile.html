@@ -45,6 +45,16 @@
                         </div>
                     </div>
 
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <div class="h2 fw-bold text-info">{{ checked_in_count }}</div>
+                        <div class="text-muted">На парковці</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
                     <div class="col-md-4">
                         <div class="card border-0 shadow-sm">
                             <div class="card-body text-center">
@@ -103,12 +113,16 @@
                                     </td>
                                     <td>
                                         {% if reservation.status == 'active' %}
-                                            <span class="badge bg-primary">Активне</span>
-                                        {% elif reservation.status == 'cancelled' %}
-                                            <span class="badge bg-danger">Скасоване</span>
-                                        {% else %}
-                                            <span class="badge bg-success">Завершене</span>
-                                        {% endif %}
+    <span class="badge bg-primary">Активне</span>
+{% elif reservation.status == 'checked_in' %}
+    <span class="badge bg-info text-dark">Авто на парковці</span>
+{% elif reservation.status == 'cancelled' %}
+    <span class="badge bg-danger">Скасоване</span>
+{% elif reservation.status == 'completed' %}
+    <span class="badge bg-success">Завершене</span>
+{% else %}
+    <span class="badge bg-secondary">{{ reservation.get_status_display }}</span>
+{% endif %}
                                     </td>
                                     <td>{{ reservation.total_price }} грн</td>
                                     <td>
