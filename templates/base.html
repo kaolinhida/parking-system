@@ -16,6 +16,10 @@
     <a class="nav-link" href="{% url 'parkings:parking_list' %}">Парковки</a>
 
     {% if user.is_authenticated %}
+        {% if user.is_staff %}
+            <a class="nav-link" href="{% url 'dashboard:home' %}">Dashboard</a>
+        {% endif %}
+        
     <a class="nav-link" href="{% url 'vehicles:vehicle_list' %}">Мій гараж</a>
     <a class="nav-link" href="{% url 'accounts:profile' %}">Мій кабінет</a>
 

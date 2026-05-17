@@ -1,0 +1,277 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard | Parking System{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="mb-4">
+            <h1 class="fw-bold">Панель адміністратора</h1>
+            <p class="text-muted mb-0">
+                Загальна статистика роботи інформаційної системи паркування.
+            </p>
+            <p class="small text-muted mt-2 mb-0">
+                Оновлено: {{ now|date:"d.m.Y H:i" }}
+            </p>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <div class="col-sm-6 col-xl-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="text-muted">Парковки</div>
+                        <div class="h2 fw-bold mb-0">{{ total_parking_lots }}</div>
+                        <div class="small text-muted">
+                            Активні: {{ active_parking_lots }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-xl-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="text-muted">Паркомісця</div>
+                        <div class="h2 fw-bold mb-0">{{ total_spaces }}</div>
+                        <div class="small text-muted">
+                            Активні: {{ active_spaces }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-xl-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="text-muted">Усього бронювань</div>
+                        <div class="h2 fw-bold mb-0">{{ total_reservations }}</div>
+                        <div class="small text-muted">
+                            За весь час
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-xl-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="text-muted">Фінальна сума</div>
+                        <div class="h3 fw-bold mb-0">{{ final_sum }} грн</div>
+                        <div class="small text-muted">
+                            З урахуванням доплат
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <div class="col-sm-6 col-xl-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <div class="h2 fw-bold text-primary">{{ active_reservations }}</div>
+                        <div class="text-muted">Активні</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-xl-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <div class="h2 fw-bold text-info">{{ checked_in_reservations_count }}</div>
+                        <div class="text-muted">Авто на парковці</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-xl-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <div class="h2 fw-bold text-success">{{ completed_reservations }}</div>
+                        <div class="text-muted">Завершені</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-xl-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <div class="h2 fw-bold text-danger">{{ cancelled_reservations }}</div>
+                        <div class="text-muted">Скасовані</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-5">
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <h5 class="fw-bold mb-3">Фінансові показники</h5>
+
+                        <p class="mb-2">
+                            <strong>Базова сума бронювань:</strong>
+                            {{ total_base_sum }} грн
+                        </p>
+
+                        <p class="mb-2">
+                            <strong>Зафіксовані доплати:</strong>
+                            {{ stored_overtime_sum }} грн
+                        </p>
+
+                        <p class="mb-2">
+                            <strong>Поточні борги:</strong>
+                            <span class="{% if live_overtime_sum %}text-danger fw-bold{% endif %}">
+                                {{ live_overtime_sum }} грн
+                            </span>
+                        </p>
+
+                        <p class="mb-0">
+                            <strong>Усього доплат / боргів:</strong>
+                            {{ total_overtime_sum }} грн
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <h5 class="fw-bold mb-3">Поточні прострочення</h5>
+
+                        {% if live_overtime_count %}
+                            <div class="alert alert-warning mb-0">
+                                Зараз є {{ live_overtime_count }} авто, які перебувають на парковці довше,
+                                ніж було передбачено бронюванням.
+                            </div>
+                        {% else %}
+                            <div class="alert alert-success mb-0">
+                                Наразі немає авто з перевищенням часу.
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-xl-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <h5 class="fw-bold mb-3">Останні бронювання</h5>
+
+                        {% if latest_reservations %}
+                            <div class="table-responsive">
+                                <table class="table align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th>Користувач</th>
+                                            <th>Парковка</th>
+                                            <th>Місце</th>
+                                            <th>Статус</th>
+                                            <th>Сума</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        {% for reservation in latest_reservations %}
+                                            <tr>
+                                                <td>{{ reservation.user.username }}</td>
+                                                <td>{{ reservation.parking_space.parking_lot.name }}</td>
+                                                <td>{{ reservation.parking_space.number }}</td>
+                                                <td>
+                                                    {% if reservation.status == 'active' %}
+                                                        <span class="badge bg-primary">Активне</span>
+                                                    {% elif reservation.status == 'checked_in' %}
+                                                        <span class="badge bg-info text-dark">На парковці</span>
+                                                    {% elif reservation.status == 'completed' %}
+                                                        <span class="badge bg-success">Завершене</span>
+                                                    {% elif reservation.status == 'cancelled' %}
+                                                        <span class="badge bg-danger">Скасоване</span>
+                                                    {% else %}
+                                                        <span class="badge bg-secondary">
+                                                            {{ reservation.get_status_display }}
+                                                        </span>
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    {% if reservation.final_price %}
+                                                        {{ reservation.final_price }} грн
+                                                    {% else %}
+                                                        {{ reservation.total_price }} грн
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="alert alert-info mb-0">
+                                Бронювань ще немає.
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <h5 class="fw-bold mb-3">Місця, які зараз зайняті</h5>
+
+                        {% if occupied_reservations %}
+                            <div class="table-responsive">
+                                <table class="table align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th>Парковка</th>
+                                            <th>Місце</th>
+                                            <th>Авто</th>
+                                            <th>В’їзд</th>
+                                            <th>Борг</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        {% for reservation in occupied_reservations %}
+                                            <tr>
+                                                <td>{{ reservation.parking_space.parking_lot.name }}</td>
+                                                <td>{{ reservation.parking_space.number }}</td>
+                                                <td>{{ reservation.car_number }}</td>
+                                                <td>
+                                                    {% if reservation.check_in_time %}
+                                                        {{ reservation.check_in_time|date:"d.m.Y H:i" }}
+                                                    {% else %}
+                                                        —
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    {% if reservation.current_overtime_fee %}
+                                                        <span class="text-danger fw-bold">
+                                                            {{ reservation.current_overtime_fee }} грн
+                                                        </span>
+                                                        <div class="small text-muted">
+                                                            {{ reservation.current_overtime_hours }} год. понад час
+                                                        </div>
+                                                    {% else %}
+                                                        —
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="alert alert-info mb-0">
+                                Зараз на парковках немає підтверджених авто.
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
