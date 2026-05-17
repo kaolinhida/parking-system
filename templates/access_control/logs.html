@@ -2,6 +2,15 @@
 
 {% block title %}Журнал доступу | Parking System{% endblock %}
 
+{% block extra_head %}
+<style>
+    .access-log-message {
+        min-width: 16rem;
+        white-space: normal;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <section class="py-5">
     <div class="container">
@@ -20,7 +29,7 @@
         {% if logs %}
             <div class="card border-0 shadow-sm">
                 <div class="table-responsive">
-                    <table class="table align-middle mb-0">
+                    <table class="table align-middle mb-0 text-nowrap">
                         <thead class="table-light">
                             <tr>
                                 <th>Дата і час</th>
@@ -30,7 +39,7 @@
                                 <th>Місце</th>
                                 <th>Авто</th>
                                 <th>Виконав</th>
-                                <th>Повідомлення</th>
+                                <th class="access-log-message">Повідомлення</th>
                             </tr>
                         </thead>
 
@@ -87,7 +96,7 @@
                                         {% endif %}
                                     </td>
 
-                                    <td>{{ log.message }}</td>
+                                    <td class="access-log-message">{{ log.message }}</td>
                                 </tr>
                             {% endfor %}
                         </tbody>

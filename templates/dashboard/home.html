@@ -2,6 +2,17 @@
 
 {% block title %}Dashboard | Parking System{% endblock %}
 
+{% block extra_head %}
+<style>
+    @media (max-width: 575.98px) {
+        .dashboard-actions,
+        .dashboard-actions .btn {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <section class="py-5">
     <div class="container">
@@ -16,7 +27,7 @@
                 </p>
             </div>
 
-            <div class="d-flex gap-2 flex-wrap">
+            <div class="d-flex gap-2 flex-wrap dashboard-actions">
                 <a href="{% url 'dashboard:create_parking_grid' %}" class="btn btn-primary">
                     Створити парковку
                 </a>
@@ -178,7 +189,7 @@
 
                         {% if latest_reservations %}
                             <div class="table-responsive">
-                                <table class="table align-middle">
+                                <table class="table align-middle mb-0 text-nowrap">
                                     <thead>
                                         <tr>
                                             <th>Користувач</th>
@@ -238,7 +249,7 @@
 
                         {% if occupied_reservations %}
                             <div class="table-responsive">
-                                <table class="table align-middle">
+                                <table class="table align-middle mb-0 text-nowrap">
                                     <thead>
                                         <tr>
                                             <th>Парковка</th>

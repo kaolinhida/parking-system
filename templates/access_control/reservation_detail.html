@@ -2,6 +2,29 @@
 
 {% block title %}Перевірка доступу | Parking System{% endblock %}
 
+{% block extra_head %}
+<style>
+    .access-detail-table th {
+        width: 35%;
+        white-space: nowrap;
+    }
+
+    @media (max-width: 575.98px) {
+        .access-detail-card {
+            padding: 1rem !important;
+        }
+
+        .access-detail-table th {
+            white-space: normal;
+        }
+
+        .access-detail-actions .btn {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <section class="py-5">
     <div class="container">
@@ -17,95 +40,97 @@
         </div>
 
         <div class="card border-0 shadow-sm mb-4">
-            <div class="card-body p-4">
+            <div class="card-body p-4 access-detail-card">
                 <h5 class="fw-bold mb-3">Дані бронювання</h5>
 
-                <table class="table">
-                    <tbody>
-                        <tr>
-                            <th>Користувач</th>
-                            <td>{{ reservation.user.username }}</td>
-                        </tr>
-                        <tr>
-                            <th>Автомобіль</th>
-                            <td>
-                                {% if reservation.vehicle %}
-                                    {{ reservation.vehicle.brand }} {{ reservation.vehicle.model }} —
-                                {% endif %}
-                                {{ reservation.car_number }}
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>Парковка</th>
-                            <td>{{ reservation.parking_space.parking_lot.name }}</td>
-                        </tr>
-                        <tr>
-                            <th>Місце</th>
-                            <td>{{ reservation.parking_space.number }}</td>
-                        </tr>
-                        <tr>
-                            <th>Період</th>
-                            <td>
-                                {{ reservation.start_time|date:"d.m.Y H:i" }}
-                                —
-                                {{ reservation.end_time|date:"d.m.Y H:i" }}
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>Статус</th>
-                            <td>{{ reservation.get_status_display }}</td>
-                        </tr>
-                        <tr>
-                            <th>Час в’їзду</th>
-                            <td>
-                                {% if reservation.check_in_time %}
-                                    {{ reservation.check_in_time|date:"d.m.Y H:i" }}
-                                {% else %}
+                <div class="table-responsive">
+                    <table class="table access-detail-table mb-0">
+                        <tbody>
+                            <tr>
+                                <th>Користувач</th>
+                                <td>{{ reservation.user.username }}</td>
+                            </tr>
+                            <tr>
+                                <th>Автомобіль</th>
+                                <td>
+                                    {% if reservation.vehicle %}
+                                        {{ reservation.vehicle.brand }} {{ reservation.vehicle.model }} —
+                                    {% endif %}
+                                    {{ reservation.car_number }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Парковка</th>
+                                <td>{{ reservation.parking_space.parking_lot.name }}</td>
+                            </tr>
+                            <tr>
+                                <th>Місце</th>
+                                <td>{{ reservation.parking_space.number }}</td>
+                            </tr>
+                            <tr>
+                                <th>Період</th>
+                                <td>
+                                    {{ reservation.start_time|date:"d.m.Y H:i" }}
                                     —
-                                {% endif %}
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>Час виїзду</th>
-                            <td>
-                                {% if reservation.check_out_time %}
-                                    {{ reservation.check_out_time|date:"d.m.Y H:i" }}
-                                {% else %}
-                                    —
-                                {% endif %}
-                            </td>
-                        </tr>
-                        <tr>
-    <th>Вартість бронювання</th>
-    <td>{{ reservation.total_price }} грн</td>
-</tr>
+                                    {{ reservation.end_time|date:"d.m.Y H:i" }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Статус</th>
+                                <td>{{ reservation.get_status_display }}</td>
+                            </tr>
+                            <tr>
+                                <th>Час в’їзду</th>
+                                <td>
+                                    {% if reservation.check_in_time %}
+                                        {{ reservation.check_in_time|date:"d.m.Y H:i" }}
+                                    {% else %}
+                                        —
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Час виїзду</th>
+                                <td>
+                                    {% if reservation.check_out_time %}
+                                        {{ reservation.check_out_time|date:"d.m.Y H:i" }}
+                                    {% else %}
+                                        —
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Вартість бронювання</th>
+                                <td>{{ reservation.total_price }} грн</td>
+                            </tr>
 
-<tr>
-    <th>Доплата за перевищення часу</th>
-    <td>
-        {% if overtime_fee %}
-            <span class="text-danger fw-bold">{{ overtime_fee }} грн</span>
-            {% if overtime_hours %}
-                <div class="small text-muted">
-                    {{ overtime_hours }} год. понад заброньований час
+                            <tr>
+                                <th>Доплата за перевищення часу</th>
+                                <td>
+                                    {% if overtime_fee %}
+                                        <span class="text-danger fw-bold">{{ overtime_fee }} грн</span>
+                                        {% if overtime_hours %}
+                                            <div class="small text-muted">
+                                                {{ overtime_hours }} год. понад заброньований час
+                                            </div>
+                                        {% endif %}
+                                    {% else %}
+                                        —
+                                    {% endif %}
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <th>Фінальна вартість</th>
+                                <td>
+                                    <strong>{{ final_price }} грн</strong>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
-            {% endif %}
-        {% else %}
-            —
-        {% endif %}
-    </td>
-</tr>
 
-<tr>
-    <th>Фінальна вартість</th>
-    <td>
-        <strong>{{ final_price }} грн</strong>
-    </td>
-</tr>  
-                    </tbody>
-                </table>
-
-                <div class="mt-4">
+                <div class="mt-4 access-detail-actions">
                     {% if can_check_in %}
                         <div class="alert alert-success">
                             Доступ дозволено. Бронювання активне, можна підтвердити в’їзд.
