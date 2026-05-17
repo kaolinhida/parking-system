@@ -12,7 +12,14 @@
 
 <body class="bg-light">
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="navbar-nav ms-auto">
+    <div class="container-fluid">
+        <button class="navbar-toggler ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar"
+                aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="mainNavbar">
+            <div class="navbar-nav ms-auto">
     <a class="nav-link" href="{% url 'parkings:parking_list' %}">Парковки</a>
     <a class="nav-link" href="{% url 'parkings:global_search' %}">Пошук місця</a>
 
@@ -27,7 +34,7 @@
     <a class="nav-link" href="{% url 'vehicles:vehicle_list' %}">Мій гараж</a>
     <a class="nav-link" href="{% url 'accounts:profile' %}">Мій кабінет</a>
 
-    <form method="post" action="{% url 'accounts:logout' %}" class="d-inline">
+    <form method="post" action="{% url 'accounts:logout' %}" class="d-lg-inline">
         {% csrf_token %}
         <button type="submit" class="nav-link btn btn-link text-decoration-none">
             Вийти
@@ -37,7 +44,9 @@
         <a class="nav-link" href="{% url 'accounts:login' %}">Увійти</a>
         <a class="nav-link" href="{% url 'accounts:register' %}">Реєстрація</a>
     {% endif %}
-</div>
+            </div>
+        </div>
+    </div>
 </nav>
 
 {% if messages %}
