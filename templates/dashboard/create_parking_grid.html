@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+
+{% block title %}Генератор парковки | Parking System{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="mb-4">
+            <a href="{% url 'dashboard:home' %}" class="text-decoration-none">
+                ← Назад до Dashboard
+            </a>
+
+            <h1 class="fw-bold mt-3">Генератор сітки парковки</h1>
+
+            <p class="text-muted mb-0">
+                Створіть парковку, задавши кількість рядів і колонок. Система автоматично
+                згенерує паркомісця типу A1, A2, B1, B2 тощо.
+            </p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <form method="post">
+                            {% csrf_token %}
+
+                            {% if form.non_field_errors %}
+                                <div class="alert alert-danger">
+                                    {{ form.non_field_errors }}
+                                </div>
+                            {% endif %}
+
+                            <h5 class="fw-bold mb-3">Дані парковки</h5>
+
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    <label class="form-label">{{ form.name.label }}</label>
+                                    {{ form.name }}
+                                    <div class="text-danger small">{{ form.name.errors }}</div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">{{ form.address.label }}</label>
+                                    {{ form.address }}
+                                    <div class="text-danger small">{{ form.address.errors }}</div>
+                                </div>
+
+                                <div class="col-12">
+                                    <label class="form-label">{{ form.description.label }}</label>
+                                    {{ form.description }}
+                                    <div class="text-danger small">{{ form.description.errors }}</div>
+                                </div>
+                            </div>
+
+                            <h5 class="fw-bold mb-3">Координати</h5>
+
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    <label class="form-label">{{ form.latitude.label }}</label>
+                                    {{ form.latitude }}
+                                    <div class="text-danger small">{{ form.latitude.errors }}</div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">{{ form.longitude.label }}</label>
+                                    {{ form.longitude }}
+                                    <div class="text-danger small">{{ form.longitude.errors }}</div>
+                                </div>
+                            </div>
+
+                            <h5 class="fw-bold mb-3">Параметри сітки</h5>
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">{{ form.rows.label }}</label>
+                                    {{ form.rows }}
+                                    <div class="text-danger small">{{ form.rows.errors }}</div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">{{ form.columns.label }}</label>
+                                    {{ form.columns }}
+                                    <div class="text-danger small">{{ form.columns.errors }}</div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">{{ form.default_space_type.label }}</label>
+                                    {{ form.default_space_type }}
+                                    <div class="text-danger small">{{ form.default_space_type.errors }}</div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">{{ form.price_per_hour.label }}</label>
+                                    {{ form.price_per_hour }}
+                                    <div class="text-danger small">{{ form.price_per_hour.errors }}</div>
+                                </div>
+                            </div>
+
+                            <div class="mt-4">
+                                <button type="submit" class="btn btn-primary">
+                                    Створити парковку і сітку
+                                </button>
+
+                                <a href="{% url 'dashboard:home' %}" class="btn btn-outline-secondary">
+                                    Скасувати
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-3">Приклад</h5>
+
+                        <p class="text-muted">
+                            Якщо вказати:
+                        </p>
+
+                        <ul class="text-muted">
+                            <li>Ряди: 3</li>
+                            <li>Колонки: 4</li>
+                        </ul>
+
+                        <p class="text-muted mb-2">
+                            Буде створено:
+                        </p>
+
+                        <div class="border rounded p-3 bg-light">
+                            <div class="mb-2">A1 A2 A3 A4</div>
+                            <div class="mb-2">B1 B2 B3 B4</div>
+                            <div>C1 C2 C3 C4</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="alert alert-info">
+                    Після створення парковки окремі місця можна буде відредагувати
+                    через Django Admin: змінити тип місця, тариф або зробити місце неактивним.
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

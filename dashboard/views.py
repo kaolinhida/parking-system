@@ -1,12 +1,15 @@
 from decimal import Decimal
 
+from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
+from django.db import transaction
 from django.db.models import F, Sum
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.utils import timezone
 
-from parkings.models import ParkingLot, ParkingSpace
+from parkings.models import ParkingLot, ParkingSpace, Tariff
 from reservations.models import Reservation
+from .forms import ParkingGridForm
 
 
 @staff_member_required
@@ -120,4 +123,70 @@ def dashboard_home(request):
 
         'latest_reservations': latest_reservations,
         'occupied_reservations': occupied_reservations,
+    })
+
+def get_row_label(index):
+    return chr(ord('A') + index)
+
+
+@staff_member_required
+def create_parking_grid(request):
+    if request.method == 'POST':
+        form = ParkingGridForm(request.POST)
+
+        if form.is_valid():
+            with transaction.atomic():
+                parking = ParkingLot.objects.create(
+                    name=form.cleaned_data['name'],
+                    address=form.cleaned_data['address'],
+                    description=form.cleaned_data.get('description', ''),
+                    latitude=form.cleaned_data.get('latitude'),
+                    longitude=form.cleaned_data.get('longitude'),
+                    is_active=True,
+                )
+
+                default_space_type = form.cleaned_data['default_space_type']
+
+                Tariff.objects.create(
+                    parking_lot=parking,
+                    space_type=default_space_type,
+                    price_per_hour=form.cleaned_data['price_per_hour'],
+                    is_active=True,
+                )
+
+                rows = form.cleaned_data['rows']
+                columns = form.cleaned_data['columns']
+
+                spaces = []
+
+                for row_index in range(rows):
+                    row_label = get_row_label(row_index)
+
+                    for column_number in range(1, columns + 1):
+                        space_number = f'{row_label}{column_number}'
+
+                        spaces.append(
+                            ParkingSpace(
+                                parking_lot=parking,
+                                space_type=default_space_type,
+                                number=space_number,
+                                row=row_index + 1,
+                                column=column_number,
+                                is_active=True,
+                            )
+                        )
+
+                ParkingSpace.objects.bulk_create(spaces)
+
+            messages.success(
+                request,
+                f'Парковку "{parking.name}" успішно створено. Згенеровано {rows * columns} паркомісць.'
+            )
+
+            return redirect('parkings:parking_detail', parking.id)
+    else:
+        form = ParkingGridForm()
+
+    return render(request, 'dashboard/create_parking_grid.html', {
+        'form': form,
     })
