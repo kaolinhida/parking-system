@@ -28,6 +28,7 @@ urlpatterns = [
     path('vehicles/', include('vehicles.urls')),
     path('access-control/', include('access_control.urls')),
     path('dashboard/', include('dashboard.urls')),
+    path('reports/', include('reports.urls')),
 ]
 
 if settings.DEBUG:

@@ -18,8 +18,9 @@
     {% if user.is_authenticated %}
         {% if user.is_staff %}
             <a class="nav-link" href="{% url 'dashboard:home' %}">Dashboard</a>
+            <a class="nav-link" href="{% url 'reports:home' %}">Звіти</a>
         {% endif %}
-        
+
     <a class="nav-link" href="{% url 'vehicles:vehicle_list' %}">Мій гараж</a>
     <a class="nav-link" href="{% url 'accounts:profile' %}">Мій кабінет</a>
 

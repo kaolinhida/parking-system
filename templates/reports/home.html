@@ -1,0 +1,241 @@
+{% extends 'base.html' %}
+
+{% block title %}Звіти | Parking System{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="mb-4">
+            <h1 class="fw-bold">Звіти</h1>
+            <p class="text-muted mb-0">
+                Аналітична інформація про бронювання, статуси та фінансові показники.
+            </p>
+            <p class="small text-muted mt-2 mb-0">
+                Оновлено: {{ now|date:"d.m.Y H:i" }}
+            </p>
+        </div>
+
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+                <h5 class="fw-bold mb-3">Фільтри звіту</h5>
+
+                <form method="get" class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label">{{ form.date_from.label }}</label>
+                        {{ form.date_from }}
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">{{ form.date_to.label }}</label>
+                        {{ form.date_to }}
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">{{ form.parking_lot.label }}</label>
+                        {{ form.parking_lot }}
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">{{ form.status.label }}</label>
+                        {{ form.status }}
+                    </div>
+
+                    {% if form.non_field_errors %}
+                        <div class="col-12">
+                            <div class="alert alert-danger mb-0">
+                                {{ form.non_field_errors }}
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary">
+                            Сформувати звіт
+                        </button>
+
+                        <a href="{% url 'reports:home' %}" class="btn btn-outline-secondary">
+                            Скинути фільтр
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <div class="col-sm-6 col-xl-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <div class="h2 fw-bold">{{ total_count }}</div>
+                        <div class="text-muted">Усього бронювань</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-xl-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <div class="h2 fw-bold text-primary">{{ active_count }}</div>
+                        <div class="text-muted">Активні</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-xl-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <div class="h2 fw-bold text-info">{{ checked_in_count }}</div>
+                        <div class="text-muted">Авто на парковці</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-xl-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <div class="h2 fw-bold text-success">{{ completed_count }}</div>
+                        <div class="text-muted">Завершені</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-5">
+            <div class="col-sm-6 col-xl-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <div class="h2 fw-bold text-danger">{{ cancelled_count }}</div>
+                        <div class="text-muted">Скасовані</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-xl-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="text-muted">Базова сума</div>
+                        <div class="h4 fw-bold mb-0">{{ total_base_sum }} грн</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-xl-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="text-muted">Доплати / борги</div>
+                        <div class="h4 fw-bold mb-0 {% if total_overtime_sum %}text-danger{% endif %}">
+                            {{ total_overtime_sum }} грн
+                        </div>
+
+                        {% if live_overtime_count %}
+                            <div class="small text-muted">
+                                Поточних прострочень: {{ live_overtime_count }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-xl-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="text-muted">Фінальна сума</div>
+                        <div class="h4 fw-bold mb-0">{{ final_sum }} грн</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <h5 class="fw-bold mb-3">Деталізація бронювань</h5>
+
+                {% if reservations %}
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Користувач</th>
+                                    <th>Парковка</th>
+                                    <th>Місце</th>
+                                    <th>Авто</th>
+                                    <th>Період</th>
+                                    <th>Статус</th>
+                                    <th>Базова сума</th>
+                                    <th>Доплата</th>
+                                    <th>Фінальна сума</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                {% for reservation in reservations %}
+                                    <tr>
+                                        <td>{{ reservation.user.username }}</td>
+
+                                        <td>{{ reservation.parking_space.parking_lot.name }}</td>
+
+                                        <td>{{ reservation.parking_space.number }}</td>
+
+                                        <td>{{ reservation.car_number }}</td>
+
+                                        <td>
+                                            {{ reservation.start_time|date:"d.m.Y H:i" }}
+                                            —
+                                            {{ reservation.end_time|date:"d.m.Y H:i" }}
+                                        </td>
+
+                                        <td>
+                                            {% if reservation.status == 'active' %}
+                                                <span class="badge bg-primary">Активне</span>
+                                            {% elif reservation.status == 'checked_in' %}
+                                                <span class="badge bg-info text-dark">Авто на парковці</span>
+                                            {% elif reservation.status == 'completed' %}
+                                                <span class="badge bg-success">Завершене</span>
+                                            {% elif reservation.status == 'cancelled' %}
+                                                <span class="badge bg-danger">Скасоване</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">
+                                                    {{ reservation.get_status_display }}
+                                                </span>
+                                            {% endif %}
+                                        </td>
+
+                                        <td>{{ reservation.total_price }} грн</td>
+
+                                        <td>
+                                            {% if reservation.overtime_fee_display %}
+                                                <span class="text-danger fw-bold">
+                                                    {{ reservation.overtime_fee_display }} грн
+                                                </span>
+
+                                                {% if reservation.overtime_hours_display %}
+                                                    <div class="small text-muted">
+                                                        {{ reservation.overtime_hours_display }} год. понад час
+                                                    </div>
+                                                {% endif %}
+                                            {% else %}
+                                                —
+                                            {% endif %}
+                                        </td>
+
+                                        <td>
+                                            {% if reservation.status == 'cancelled' %}
+                                                —
+                                            {% else %}
+                                                <strong>{{ reservation.final_price_display }} грн</strong>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info mb-0">
+                        За вибраними параметрами бронювань не знайдено.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
