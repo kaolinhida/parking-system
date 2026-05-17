@@ -54,9 +54,20 @@
                                     <strong>Колір:</strong> {{ vehicle.get_color_display }}
                                 </p>
 
-                                <a href="{% url 'vehicles:vehicle_edit' vehicle.id %}" class="btn btn-sm btn-outline-primary">
-                                    Редагувати
-                                </a>
+                                <div class="d-flex gap-2 flex-wrap">
+                                    <a href="{% url 'vehicles:vehicle_edit' vehicle.id %}" class="btn btn-sm btn-outline-primary">
+                                        Редагувати
+                                    </a>
+
+                                    <form method="post"
+                                          action="{% url 'vehicles:vehicle_deactivate' vehicle.id %}"
+                                          onsubmit="return confirm('Видалити це авто з гаража?');">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                            Видалити з гаража
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
                         </div>
                     </div>
