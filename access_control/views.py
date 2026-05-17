@@ -1,10 +1,24 @@
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import redirect, render
 from django.utils import timezone
 
 from reservations.models import Reservation
 from .forms import AccessCodeForm
+from .models import AccessLog
+
+
+def create_access_log(reservation, access_token, action, result, message, user):
+    performed_by = user if user.is_authenticated else None
+
+    AccessLog.objects.create(
+        reservation=reservation,
+        access_token=str(access_token) if access_token else '',
+        action=action,
+        result=result,
+        message=message,
+        performed_by=performed_by,
+    )
 
 
 @staff_member_required
@@ -21,17 +35,51 @@ def access_control_home(request):
 
 
 @staff_member_required
+def access_logs(request):
+    logs = (
+        AccessLog.objects
+        .select_related(
+            'reservation',
+            'reservation__parking_space',
+            'reservation__parking_space__parking_lot',
+            'performed_by',
+        )
+        .order_by('-created_at')[:100]
+    )
+
+    return render(request, 'access_control/logs.html', {
+        'logs': logs,
+    })
+
+
+@staff_member_required
 def reservation_detail(request, access_token):
-    reservation = get_object_or_404(
-        Reservation.objects.select_related(
+    reservation = (
+        Reservation.objects
+        .select_related(
             'user',
             'parking_space',
             'parking_space__parking_lot',
             'parking_space__space_type',
             'vehicle',
-        ),
-        access_token=access_token
+        )
+        .filter(access_token=access_token)
+        .first()
     )
+
+    if reservation is None:
+        create_access_log(
+            reservation=None,
+            access_token=access_token,
+            action=AccessLog.ACTION_SCAN,
+            result=AccessLog.RESULT_DENIED,
+            message='Спроба перевірити QR-код, для якого не знайдено бронювання.',
+            user=request.user,
+        )
+
+        return render(request, 'access_control/reservation_not_found.html', {
+            'access_token': access_token,
+        })
 
     now = timezone.now()
 
@@ -61,6 +109,27 @@ def reservation_detail(request, access_token):
         overtime_fee = reservation.overtime_fee
         final_price = reservation.final_price or reservation.total_price + overtime_fee
 
+    if can_check_in:
+        log_result = AccessLog.RESULT_ALLOWED
+        log_message = 'QR-код перевірено. Бронювання активне, в’їзд дозволено.'
+    elif can_check_out:
+        log_result = AccessLog.RESULT_ALLOWED
+        log_message = 'QR-код перевірено. Автомобіль перебуває на парковці, доступне підтвердження виїзду.'
+    else:
+        log_result = AccessLog.RESULT_DENIED
+        log_message = 'QR-код перевірено, але для бронювання зараз немає доступної дії.'
+
+    create_access_log(
+        reservation=reservation,
+        access_token=access_token,
+        action=AccessLog.ACTION_SCAN,
+        result=log_result,
+        message=log_message,
+        user=request.user,
+    )
+
+    reservation_logs = reservation.access_logs.select_related('performed_by')[:10]
+
     return render(request, 'access_control/reservation_detail.html', {
         'reservation': reservation,
         'now': now,
@@ -69,12 +138,29 @@ def reservation_detail(request, access_token):
         'overtime_hours': overtime_hours,
         'overtime_fee': overtime_fee,
         'final_price': final_price,
+        'reservation_logs': reservation_logs,
     })
 
 
 @staff_member_required
 def check_in(request, access_token):
-    reservation = get_object_or_404(Reservation, access_token=access_token)
+    reservation = (
+        Reservation.objects
+        .filter(access_token=access_token)
+        .first()
+    )
+
+    if reservation is None:
+        create_access_log(
+            reservation=None,
+            access_token=access_token,
+            action=AccessLog.ACTION_CHECK_IN,
+            result=AccessLog.RESULT_DENIED,
+            message='Спроба підтвердити в’їзд за неіснуючим QR-кодом.',
+            user=request.user,
+        )
+        messages.error(request, 'Бронювання за цим QR-кодом не знайдено.')
+        return redirect('access_control:home')
 
     if request.method != 'POST':
         return redirect('access_control:reservation_detail', access_token=access_token)
@@ -82,14 +168,41 @@ def check_in(request, access_token):
     now = timezone.now()
 
     if reservation.status != Reservation.STATUS_ACTIVE:
+        create_access_log(
+            reservation=reservation,
+            access_token=access_token,
+            action=AccessLog.ACTION_CHECK_IN,
+            result=AccessLog.RESULT_DENIED,
+            message='В’їзд заборонено: бронювання не є активним.',
+            user=request.user,
+        )
+
         messages.error(request, 'В’їзд неможливий: бронювання не є активним.')
         return redirect('access_control:reservation_detail', access_token=access_token)
 
     if reservation.check_in_time is not None:
+        create_access_log(
+            reservation=reservation,
+            access_token=access_token,
+            action=AccessLog.ACTION_CHECK_IN,
+            result=AccessLog.RESULT_DENIED,
+            message='В’їзд заборонено: в’їзд уже було підтверджено раніше.',
+            user=request.user,
+        )
+
         messages.error(request, 'В’їзд уже було підтверджено раніше.')
         return redirect('access_control:reservation_detail', access_token=access_token)
 
     if not (reservation.start_time <= now <= reservation.end_time):
+        create_access_log(
+            reservation=reservation,
+            access_token=access_token,
+            action=AccessLog.ACTION_CHECK_IN,
+            result=AccessLog.RESULT_DENIED,
+            message='В’їзд заборонено: поточний час не входить у період бронювання.',
+            user=request.user,
+        )
+
         messages.error(request, 'В’їзд неможливий: поточний час не входить у період бронювання.')
         return redirect('access_control:reservation_detail', access_token=access_token)
 
@@ -97,22 +210,65 @@ def check_in(request, access_token):
     reservation.status = Reservation.STATUS_CHECKED_IN
     reservation.save()
 
+    create_access_log(
+        reservation=reservation,
+        access_token=access_token,
+        action=AccessLog.ACTION_CHECK_IN,
+        result=AccessLog.RESULT_SUCCESS,
+        message='В’їзд підтверджено. Автомобіль позначено як такий, що заїхав на парковку.',
+        user=request.user,
+    )
+
     messages.success(request, 'В’їзд підтверджено. Автомобіль позначено як такий, що заїхав на парковку.')
     return redirect('access_control:reservation_detail', access_token=access_token)
 
 
 @staff_member_required
 def check_out(request, access_token):
-    reservation = get_object_or_404(Reservation, access_token=access_token)
+    reservation = (
+        Reservation.objects
+        .filter(access_token=access_token)
+        .first()
+    )
+
+    if reservation is None:
+        create_access_log(
+            reservation=None,
+            access_token=access_token,
+            action=AccessLog.ACTION_CHECK_OUT,
+            result=AccessLog.RESULT_DENIED,
+            message='Спроба підтвердити виїзд за неіснуючим QR-кодом.',
+            user=request.user,
+        )
+        messages.error(request, 'Бронювання за цим QR-кодом не знайдено.')
+        return redirect('access_control:home')
 
     if request.method != 'POST':
         return redirect('access_control:reservation_detail', access_token=access_token)
 
     if reservation.status != Reservation.STATUS_CHECKED_IN:
+        create_access_log(
+            reservation=reservation,
+            access_token=access_token,
+            action=AccessLog.ACTION_CHECK_OUT,
+            result=AccessLog.RESULT_DENIED,
+            message='Виїзд заборонено: автомобіль ще не позначено як такий, що заїхав.',
+            user=request.user,
+        )
+
         messages.error(request, 'Виїзд неможливий: автомобіль ще не позначено як такий, що заїхав.')
         return redirect('access_control:reservation_detail', access_token=access_token)
 
     if reservation.check_out_time is not None:
+        create_access_log(
+            reservation=reservation,
+            access_token=access_token,
+            action=AccessLog.ACTION_CHECK_OUT,
+            result=AccessLog.RESULT_DENIED,
+            message='Виїзд заборонено: виїзд уже було підтверджено раніше.',
+            user=request.user,
+        )
+
         messages.error(request, 'Виїзд уже було підтверджено раніше.')
         return redirect('access_control:reservation_detail', access_token=access_token)
 
@@ -126,6 +282,15 @@ def check_out(request, access_token):
     reservation.final_price = final_price
     reservation.status = Reservation.STATUS_COMPLETED
     reservation.save()
+
+    create_access_log(
+        reservation=reservation,
+        access_token=access_token,
+        action=AccessLog.ACTION_CHECK_OUT,
+        result=AccessLog.RESULT_SUCCESS,
+        message=f'Виїзд підтверджено. Фінальна вартість: {final_price} грн. Доплата: {overtime_fee} грн.',
+        user=request.user,
+    )
 
     if overtime_fee > 0:
         messages.warning(

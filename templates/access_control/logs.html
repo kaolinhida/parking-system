@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block title %}Журнал доступу | Parking System{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="mb-4">
+            <a href="{% url 'dashboard:home' %}" class="text-decoration-none">
+                ← Назад до Dashboard
+            </a>
+
+            <h1 class="fw-bold mt-3">Журнал доступу</h1>
+
+            <p class="text-muted mb-0">
+                Історія перевірок QR-кодів, підтверджень в’їзду та виїзду.
+            </p>
+        </div>
+
+        {% if logs %}
+            <div class="card border-0 shadow-sm">
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Дата і час</th>
+                                <th>Дія</th>
+                                <th>Результат</th>
+                                <th>Парковка</th>
+                                <th>Місце</th>
+                                <th>Авто</th>
+                                <th>Виконав</th>
+                                <th>Повідомлення</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for log in logs %}
+                                <tr>
+                                    <td>{{ log.created_at|date:"d.m.Y H:i:s" }}</td>
+
+                                    <td>{{ log.get_action_display }}</td>
+
+                                    <td>
+                                        {% if log.result == 'allowed' %}
+                                            <span class="badge bg-primary">Дозволено</span>
+                                        {% elif log.result == 'success' %}
+                                            <span class="badge bg-success">Успішно</span>
+                                        {% elif log.result == 'denied' %}
+                                            <span class="badge bg-danger">Заборонено</span>
+                                        {% elif log.result == 'error' %}
+                                            <span class="badge bg-danger">Помилка</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">{{ log.get_result_display }}</span>
+                                        {% endif %}
+                                    </td>
+
+                                    <td>
+                                        {% if log.reservation %}
+                                            {{ log.reservation.parking_space.parking_lot.name }}
+                                        {% else %}
+                                            —
+                                        {% endif %}
+                                    </td>
+
+                                    <td>
+                                        {% if log.reservation %}
+                                            {{ log.reservation.parking_space.number }}
+                                        {% else %}
+                                            —
+                                        {% endif %}
+                                    </td>
+
+                                    <td>
+                                        {% if log.reservation %}
+                                            {{ log.reservation.car_number }}
+                                        {% else %}
+                                            —
+                                        {% endif %}
+                                    </td>
+
+                                    <td>
+                                        {% if log.performed_by %}
+                                            {{ log.performed_by.username }}
+                                        {% else %}
+                                            —
+                                        {% endif %}
+                                    </td>
+
+                                    <td>{{ log.message }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                Журнал доступу поки порожній.
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

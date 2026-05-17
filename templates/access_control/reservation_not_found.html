@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}Бронювання не знайдено | Parking System{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="mb-4">
+            <a href="{% url 'access_control:home' %}" class="text-decoration-none">
+                ← Назад до контролю доступу
+            </a>
+
+            <h1 class="fw-bold mt-3">Бронювання не знайдено</h1>
+
+            <p class="text-muted mb-0">
+                QR-код або токен доступу не відповідає жодному бронюванню.
+            </p>
+        </div>
+
+        <div class="alert alert-danger">
+            Доступ заборонено. Бронювання з таким кодом не знайдено.
+        </div>
+
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <p class="mb-2">
+                    <strong>Отриманий токен:</strong>
+                </p>
+
+                <code>{{ access_token }}</code>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
