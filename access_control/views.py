@@ -22,6 +22,54 @@ def create_access_log(reservation, access_token, action, result, message, user):
     )
 
 
+QR_NOT_FOUND_MESSAGE = 'QR-код не знайдено: бронювання за цим кодом не існує.'
+
+
+def get_check_in_unavailable_reason(reservation, now):
+    if reservation.status == Reservation.STATUS_CANCELLED:
+        return 'В’їзд неможливий: бронювання скасоване.'
+
+    if reservation.status == Reservation.STATUS_COMPLETED:
+        return 'В’їзд неможливий: бронювання вже завершене.'
+
+    if reservation.check_in_time is not None or reservation.status == Reservation.STATUS_CHECKED_IN:
+        return 'В’їзд неможливий: автомобіль уже заїхав на парковку.'
+
+    if reservation.status != Reservation.STATUS_ACTIVE:
+        return 'В’їзд неможливий: бронювання не є активним.'
+
+    if now < reservation.start_time:
+        return 'В’їзд неможливий: бронювання ще не почалося.'
+
+    if now > reservation.end_time:
+        return 'В’їзд неможливий: час бронювання вже завершився.'
+
+    return 'В’їзд неможливий: поточний час не входить у період бронювання.'
+
+
+def get_check_out_unavailable_reason(reservation):
+    if reservation.status == Reservation.STATUS_CANCELLED:
+        return 'Виїзд неможливий: бронювання скасоване.'
+
+    if reservation.status == Reservation.STATUS_COMPLETED or reservation.check_out_time is not None:
+        return 'Виїзд неможливий: бронювання вже завершене.'
+
+    if reservation.check_in_time is None:
+        return 'Виїзд неможливий: автомобіль ще не заїхав, тому виїзд неможливий.'
+
+    if reservation.status != Reservation.STATUS_CHECKED_IN:
+        return 'Виїзд неможливий: автомобіль не перебуває на парковці.'
+
+    return 'Виїзд неможливий для поточного стану бронювання.'
+
+
+def get_scan_unavailable_reason(reservation, now):
+    if reservation.status == Reservation.STATUS_CHECKED_IN:
+        return get_check_out_unavailable_reason(reservation)
+
+    return get_check_in_unavailable_reason(reservation, now)
+
+
 @gate_access_required
 def access_control_home(request):
     form = AccessCodeForm(request.POST or None)
@@ -118,7 +166,7 @@ def reservation_detail(request, access_token):
             access_token=access_token,
             action=AccessLog.ACTION_SCAN,
             result=AccessLog.RESULT_DENIED,
-            message='Спроба перевірити QR-код, для якого не знайдено бронювання.',
+            message=QR_NOT_FOUND_MESSAGE,
             user=request.user,
         )
 
@@ -162,7 +210,7 @@ def reservation_detail(request, access_token):
         log_message = 'QR-код перевірено. Автомобіль перебуває на парковці, доступне підтвердження виїзду.'
     else:
         log_result = AccessLog.RESULT_DENIED
-        log_message = 'QR-код перевірено, але для бронювання зараз немає доступної дії.'
+        log_message = f'QR-код перевірено. {get_scan_unavailable_reason(reservation, now)}'
 
     create_access_log(
         reservation=reservation,
@@ -180,6 +228,7 @@ def reservation_detail(request, access_token):
         'now': now,
         'can_check_in': can_check_in,
         'can_check_out': can_check_out,
+        'access_unavailable_reason': None if log_result != AccessLog.RESULT_DENIED else get_scan_unavailable_reason(reservation, now),
         'overtime_hours': overtime_hours,
         'overtime_fee': overtime_fee,
         'final_price': final_price,
@@ -201,10 +250,10 @@ def check_in(request, access_token):
             access_token=access_token,
             action=AccessLog.ACTION_CHECK_IN,
             result=AccessLog.RESULT_DENIED,
-            message='Спроба підтвердити в’їзд за неіснуючим QR-кодом.',
+            message=QR_NOT_FOUND_MESSAGE,
             user=request.user,
         )
-        messages.error(request, 'Бронювання за цим QR-кодом не знайдено.')
+        messages.error(request, QR_NOT_FOUND_MESSAGE)
         return redirect('access_control:home')
 
     if request.method != 'POST':
@@ -213,42 +262,45 @@ def check_in(request, access_token):
     now = timezone.now()
 
     if reservation.status != Reservation.STATUS_ACTIVE:
+        reason = get_check_in_unavailable_reason(reservation, now)
         create_access_log(
             reservation=reservation,
             access_token=access_token,
             action=AccessLog.ACTION_CHECK_IN,
             result=AccessLog.RESULT_DENIED,
-            message='В’їзд заборонено: бронювання не є активним.',
+            message=reason,
             user=request.user,
         )
 
-        messages.error(request, 'В’їзд неможливий: бронювання не є активним.')
+        messages.error(request, reason)
         return redirect('access_control:reservation_detail', access_token=access_token)
 
     if reservation.check_in_time is not None:
+        reason = get_check_in_unavailable_reason(reservation, now)
         create_access_log(
             reservation=reservation,
             access_token=access_token,
             action=AccessLog.ACTION_CHECK_IN,
             result=AccessLog.RESULT_DENIED,
-            message='В’їзд заборонено: в’їзд уже було підтверджено раніше.',
+            message=reason,
             user=request.user,
         )
 
-        messages.error(request, 'В’їзд уже було підтверджено раніше.')
+        messages.error(request, reason)
         return redirect('access_control:reservation_detail', access_token=access_token)
 
     if not (reservation.start_time <= now <= reservation.end_time):
+        reason = get_check_in_unavailable_reason(reservation, now)
         create_access_log(
             reservation=reservation,
             access_token=access_token,
             action=AccessLog.ACTION_CHECK_IN,
             result=AccessLog.RESULT_DENIED,
-            message='В’їзд заборонено: поточний час не входить у період бронювання.',
+            message=reason,
             user=request.user,
         )
 
-        messages.error(request, 'В’їзд неможливий: поточний час не входить у період бронювання.')
+        messages.error(request, reason)
         return redirect('access_control:reservation_detail', access_token=access_token)
 
     reservation.check_in_time = now
@@ -282,39 +334,41 @@ def check_out(request, access_token):
             access_token=access_token,
             action=AccessLog.ACTION_CHECK_OUT,
             result=AccessLog.RESULT_DENIED,
-            message='Спроба підтвердити виїзд за неіснуючим QR-кодом.',
+            message=QR_NOT_FOUND_MESSAGE,
             user=request.user,
         )
-        messages.error(request, 'Бронювання за цим QR-кодом не знайдено.')
+        messages.error(request, QR_NOT_FOUND_MESSAGE)
         return redirect('access_control:home')
 
     if request.method != 'POST':
         return redirect('access_control:reservation_detail', access_token=access_token)
 
     if reservation.status != Reservation.STATUS_CHECKED_IN:
+        reason = get_check_out_unavailable_reason(reservation)
         create_access_log(
             reservation=reservation,
             access_token=access_token,
             action=AccessLog.ACTION_CHECK_OUT,
             result=AccessLog.RESULT_DENIED,
-            message='Виїзд заборонено: автомобіль ще не позначено як такий, що заїхав.',
+            message=reason,
             user=request.user,
         )
 
-        messages.error(request, 'Виїзд неможливий: автомобіль ще не позначено як такий, що заїхав.')
+        messages.error(request, reason)
         return redirect('access_control:reservation_detail', access_token=access_token)
 
     if reservation.check_out_time is not None:
+        reason = get_check_out_unavailable_reason(reservation)
         create_access_log(
             reservation=reservation,
             access_token=access_token,
             action=AccessLog.ACTION_CHECK_OUT,
             result=AccessLog.RESULT_DENIED,
-            message='Виїзд заборонено: виїзд уже було підтверджено раніше.',
+            message=reason,
             user=request.user,
         )
 
-        messages.error(request, 'Виїзд уже було підтверджено раніше.')
+        messages.error(request, reason)
         return redirect('access_control:reservation_detail', access_token=access_token)
 
     now = timezone.now()
