@@ -1,0 +1,225 @@
+{% extends 'base.html' %}
+
+{% block title %}Про систему | Parking System{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-8">
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle mb-3">
+                    Про дипломний проєкт
+                </span>
+
+                <h1 class="display-5 fw-bold mb-3">
+                    Інформаційна система для підтримки процесу паркування автомобілів
+                </h1>
+
+                <p class="lead text-muted mb-4">
+                    Система призначена для організації пошуку, бронювання та контролю використання
+                    паркомісць. Вона поєднує користувацький кабінет, керування автомобілями,
+                    QR-контроль доступу, фінансовий облік і адміністративну аналітику.
+                </p>
+
+                <div class="d-flex gap-3 flex-wrap stacked-actions">
+                    <a href="{% url 'parkings:global_search' %}" class="btn btn-primary btn-lg">
+                        Знайти місце
+                    </a>
+                    <a href="{% url 'parkings:parking_list' %}" class="btn btn-outline-primary btn-lg">
+                        Переглянути парковки
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <h2 class="h4 fw-bold mb-3">Призначення</h2>
+                        <p class="text-muted mb-0">
+                            Проєкт демонструє повний цикл роботи парковки: від вибору місця
+                            користувачем до контролю в'їзду, виїзду, оплати та звітності.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5 bg-white">
+    <div class="container">
+        <div class="mb-4">
+            <h2 class="h3 fw-bold mb-2">Основні ролі</h2>
+            <p class="text-muted mb-0">
+                Доступ до функцій системи розділений відповідно до задач кожного учасника процесу.
+            </p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <span class="badge bg-primary mb-3">Користувач</span>
+                        <h3 class="h5 fw-bold">Водій автомобіля</h3>
+                        <p class="text-muted mb-0">
+                            Переглядає парковки, шукає доступне місце, додає авто в гараж,
+                            створює бронювання та використовує QR-код для доступу.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <span class="badge bg-dark mb-3">Оператор КПП</span>
+                        <h3 class="h5 fw-bold">Контроль доступу</h3>
+                        <p class="text-muted mb-0">
+                            Перевіряє QR-коди, підтверджує в'їзд або виїзд автомобіля
+                            та переглядає журнал подій доступу.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <span class="badge bg-success mb-3">Адміністратор</span>
+                        <h3 class="h5 fw-bold">Керування системою</h3>
+                        <p class="text-muted mb-0">
+                            Керує парковками, паркомісцями, тарифами, оплатами, звітами,
+                            dashboard-показниками та доступом персоналу.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="mb-4">
+            <h2 class="h3 fw-bold mb-2">Основні можливості</h2>
+            <p class="text-muted mb-0">
+                Функціональність охоплює користувацькі сценарії, роботу оператора та адміністративний контроль.
+            </p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-6 col-xl-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <h3 class="h5 fw-bold">Парковки та пошук</h3>
+                        <p class="text-muted mb-0">
+                            Перегляд парковок і пошук доступного місця за часом, типом і наявністю.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-xl-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <h3 class="h5 fw-bold">Бронювання</h3>
+                        <p class="text-muted mb-0">
+                            Створення бронювання, вибір авто, розрахунок вартості та перегляд історії.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-xl-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <h3 class="h5 fw-bold">Мій гараж</h3>
+                        <p class="text-muted mb-0">
+                            Збереження автомобілів користувача для швидкого вибору під час бронювання.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-xl-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <h3 class="h5 fw-bold">QR-контроль</h3>
+                        <p class="text-muted mb-0">
+                            Перевірка QR-коду, контроль в'їзду/виїзду та фіксація подій у журналі.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-xl-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <h3 class="h5 fw-bold">Фінансовий облік</h3>
+                        <p class="text-muted mb-0">
+                            Облік базової вартості, доплат за перевищення часу та статусів оплати.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-xl-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <h3 class="h5 fw-bold">Dashboard</h3>
+                        <p class="text-muted mb-0">
+                            Адміністративна панель для перегляду ключових показників і керування системою.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-xl-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <h3 class="h5 fw-bold">Звіти</h3>
+                        <p class="text-muted mb-0">
+                            Фільтрація бронювань, фінансові підсумки та експорт даних у CSV.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-xl-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <h3 class="h5 fw-bold">Журнал доступу</h3>
+                        <p class="text-muted mb-0">
+                            Історія перевірок, дозволених і відхилених дій з можливістю фільтрації.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5 bg-white">
+    <div class="container">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4 p-lg-5">
+                <div class="row align-items-center g-4">
+                    <div class="col-lg-8">
+                        <h2 class="h3 fw-bold mb-3">Подальший розвиток</h2>
+                        <p class="text-muted mb-0">
+                            Систему можна розширити онлайн-оплатою, інтеграцією з фізичними шлагбаумами,
+                            картою зайнятості в реальному часі, push-сповіщеннями, мобільним застосунком
+                            і прогнозуванням завантаженості парковок.
+                        </p>
+                    </div>
+                    <div class="col-lg-4 text-lg-end">
+                        <a href="{% url 'core:home' %}" class="btn btn-outline-primary btn-lg">
+                            На головну
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -26,6 +26,7 @@
             <div class="navbar-nav ms-auto">
     <a class="nav-link" href="{% url 'parkings:parking_list' %}">Парковки</a>
     <a class="nav-link" href="{% url 'parkings:global_search' %}">Пошук місця</a>
+    <a class="nav-link" href="{% url 'core:about' %}">Про систему</a>
 
     {% if user.is_authenticated %}
         {% if is_parking_admin %}
