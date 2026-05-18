@@ -5,40 +5,203 @@
 {% block content %}
 <section class="py-5">
     <div class="container">
-        <div class="row align-items-center">
+        <div class="row align-items-center g-5">
             <div class="col-lg-7">
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle mb-3">
+                    Дипломний проєкт інформаційної системи
+                </span>
+
                 <h1 class="display-5 fw-bold mb-3">
-                    Інформаційна система паркування автомобілів
+                    Інформаційна система підтримки процесу паркування автомобілів
                 </h1>
 
                 <p class="lead text-muted mb-4">
-                    Сервіс дозволяє знайти доступне паркомісце, обрати зручний час,
-                    забронювати місце та переглянути власні бронювання.
+                    Система допомагає знайти вільне паркомісце, створити бронювання,
+                    керувати власними автомобілями та проходити контроль доступу за QR-кодом.
                 </p>
 
                 <div class="d-flex gap-3 flex-wrap stacked-actions">
-                    <a href="{% url 'parkings:parking_list' %}" class="btn btn-primary btn-lg">Переглянути парковки</a>
+                    <a href="{% url 'parkings:global_search' %}" class="btn btn-primary btn-lg">
+                        Знайти місце
+                    </a>
+                    <a href="{% url 'parkings:parking_list' %}" class="btn btn-outline-primary btn-lg">
+                        Переглянути парковки
+                    </a>
 
                     {% if user.is_authenticated %}
-                        <a href="{% url 'accounts:profile' %}" class="btn btn-outline-dark btn-lg">Мій кабінет</a>
+                        <a href="{% url 'accounts:profile' %}" class="btn btn-outline-dark btn-lg">
+                            Мій кабінет
+                        </a>
                     {% else %}
-                        <a href="{% url 'accounts:register' %}" class="btn btn-outline-dark btn-lg">Зареєструватися</a>
+                        <a href="{% url 'accounts:login' %}" class="btn btn-outline-dark btn-lg">
+                            Увійти
+                        </a>
                     {% endif %}
                 </div>
             </div>
 
-            <div class="col-lg-5 mt-5 mt-lg-0">
-                <div class="card shadow border-0">
+            <div class="col-lg-5">
+                <div class="card border-0 shadow-sm">
                     <div class="card-body p-4">
-                        <h5 class="card-title fw-bold">Можливості системи</h5>
+                        <div class="d-flex justify-content-between align-items-start gap-3 mb-4">
+                            <div>
+                                <p class="text-muted small mb-1">Стан парковки</p>
+                                <h2 class="h4 fw-bold mb-0">Швидкий пошук місця</h2>
+                            </div>
+                            <span class="badge bg-success">Online</span>
+                        </div>
 
-                        <ul class="list-group list-group-flush mt-3">
-                            <li class="list-group-item">Пошук доступних паркомісць</li>
-                            <li class="list-group-item">Бронювання за датою та часом</li>
-                            <li class="list-group-item">Фільтрація за типом місця</li>
-                            <li class="list-group-item">Розрахунок вартості бронювання</li>
-                            <li class="list-group-item">Особистий кабінет користувача</li>
-                        </ul>
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <div class="p-3 rounded border bg-light h-100">
+                                    <div class="fw-bold fs-4 text-success">24/7</div>
+                                    <div class="small text-muted">доступ до сервісу</div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="p-3 rounded border bg-light h-100">
+                                    <div class="fw-bold fs-4 text-primary">QR</div>
+                                    <div class="small text-muted">контроль в'їзду</div>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="p-3 rounded border bg-light">
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span class="text-muted">Бронювання</span>
+                                        <span class="fw-semibold">Активне</span>
+                                    </div>
+                                    <div class="progress" role="progressbar" aria-label="Reservation progress" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">
+                                        <div class="progress-bar" style="width: 75%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <a href="{% url 'parkings:global_search' %}" class="btn btn-primary w-100 mt-4">
+                            Перейти до пошуку
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5 bg-white">
+    <div class="container">
+        <div class="mb-4">
+            <h2 class="h3 fw-bold mb-2">Можливості системи</h2>
+            <p class="text-muted mb-0">
+                Основні модулі об'єднані в єдиний робочий процес для користувача та адміністратора.
+            </p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-6 col-xl-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <span class="badge bg-success mb-3">Бронювання</span>
+                        <h3 class="h5 fw-bold">Бронювання паркомісць</h3>
+                        <p class="text-muted mb-0">
+                            Пошук вільного місця за датою, часом, парковкою та типом паркомісця.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-xl-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <span class="badge bg-primary mb-3">Гараж</span>
+                        <h3 class="h5 fw-bold">Мій гараж</h3>
+                        <p class="text-muted mb-0">
+                            Збереження автомобілів користувача та швидкий вибір авто під час бронювання.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-xl-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <span class="badge bg-dark mb-3">QR</span>
+                        <h3 class="h5 fw-bold">QR-контроль доступу</h3>
+                        <p class="text-muted mb-0">
+                            Перевірка бронювання оператором КПП і підтвердження в'їзду або виїзду.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-xl-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <span class="badge bg-warning text-dark mb-3">Аналітика</span>
+                        <h3 class="h5 fw-bold">Звіти та аналітика</h3>
+                        <p class="text-muted mb-0">
+                            Dashboard, фінансові показники, журнал доступу та експорт звітів у CSV.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="mb-4">
+            <h2 class="h3 fw-bold mb-2">Як працює система</h2>
+            <p class="text-muted mb-0">
+                Користувач проходить короткий шлях від пошуку місця до завершення паркування.
+            </p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-3">
+                <div class="d-flex gap-3">
+                    <div class="flex-shrink-0">
+                        <span class="badge rounded-pill bg-primary fs-6">1</span>
+                    </div>
+                    <div>
+                        <h3 class="h5 fw-bold">Оберіть місце</h3>
+                        <p class="text-muted mb-0">Перегляньте доступні парковки та знайдіть вільне паркомісце.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="d-flex gap-3">
+                    <div class="flex-shrink-0">
+                        <span class="badge rounded-pill bg-primary fs-6">2</span>
+                    </div>
+                    <div>
+                        <h3 class="h5 fw-bold">Створіть бронювання</h3>
+                        <p class="text-muted mb-0">Вкажіть час, автомобіль і підтвердьте бронювання місця.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="d-flex gap-3">
+                    <div class="flex-shrink-0">
+                        <span class="badge rounded-pill bg-primary fs-6">3</span>
+                    </div>
+                    <div>
+                        <h3 class="h5 fw-bold">Покажіть QR-код</h3>
+                        <p class="text-muted mb-0">Оператор КПП перевіряє QR-код бронювання на сторінці контролю.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="d-flex gap-3">
+                    <div class="flex-shrink-0">
+                        <span class="badge rounded-pill bg-primary fs-6">4</span>
+                    </div>
+                    <div>
+                        <h3 class="h5 fw-bold">Підтвердьте в'їзд/виїзд</h3>
+                        <p class="text-muted mb-0">Система фіксує події доступу та фінальний стан бронювання.</p>
                     </div>
                 </div>
             </div>
