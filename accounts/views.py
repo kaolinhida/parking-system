@@ -61,6 +61,11 @@ def profile(request):
     cancelled_count = reservations.filter(status=Reservation.STATUS_CANCELLED).count()
     completed_count = reservations.filter(status=Reservation.STATUS_COMPLETED).count()
 
+    overtime_debt_count = 0
+    overtime_debt_sum = 0
+    unpaid_base_count = 0
+    unpaid_overtime_count = 0
+
     for reservation in reservations:
         reservation.overtime_hours_display = 0
         reservation.overtime_fee_display = reservation.overtime_fee
@@ -80,8 +85,66 @@ def profile(request):
             reservation.overtime_fee_display = reservation.overtime_fee
             reservation.final_price_display = reservation.final_price or reservation.total_price
 
+        if reservation.overtime_fee_display:
+            overtime_debt_count += 1
+            overtime_debt_sum += reservation.overtime_fee_display
+
+            if not reservation.overtime_is_paid:
+                unpaid_overtime_count += 1
+
+        if (
+            reservation.status != Reservation.STATUS_CANCELLED
+            and not reservation.is_paid
+        ):
+            unpaid_base_count += 1
+
+    profile_messages = []
+
+    if active_count:
+        profile_messages.append({
+            'level': 'info',
+            'title': 'Активне бронювання',
+            'text': f'У вас є активні бронювання: {active_count}. Перевірте час початку та QR-код для доступу.',
+        })
+
+    if checked_in_count:
+        profile_messages.append({
+            'level': 'info',
+            'title': 'Авто на парковці',
+            'text': f'Автомобілі зараз перебувають на парковці: {checked_in_count}. Після виїзду оператор підтвердить завершення.',
+        })
+
+    if overtime_debt_count:
+        profile_messages.append({
+            'level': 'warning',
+            'title': 'Є доплата за перевищення часу',
+            'text': f'Зафіксовано доплати у {overtime_debt_count} бронюваннях на суму {overtime_debt_sum} грн.',
+        })
+
+    if unpaid_base_count:
+        profile_messages.append({
+            'level': 'warning',
+            'title': 'Базова оплата очікується',
+            'text': f'Базова оплата не позначена як оплачена у {unpaid_base_count} бронюваннях.',
+        })
+
+    if unpaid_overtime_count:
+        profile_messages.append({
+            'level': 'warning',
+            'title': 'Доплата не оплачена',
+            'text': f'Є неоплачені доплати за перевищення часу: {unpaid_overtime_count}.',
+        })
+
+    if not profile_messages:
+        profile_messages.append({
+            'level': 'success',
+            'title': 'Усе гаразд',
+            'text': 'Немає активних проблем, боргів або неоплачених доплат.',
+        })
+
     return render(request, 'accounts/profile.html', {
         'reservations': reservations,
+        'profile_messages': profile_messages,
         'active_count': active_count,
         'checked_in_count': checked_in_count,
         'cancelled_count': cancelled_count,
