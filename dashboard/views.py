@@ -1,18 +1,18 @@
 from decimal import Decimal
 
 from django.contrib import messages
-from django.contrib.admin.views.decorators import staff_member_required
 from django.db import transaction
 from django.db.models import Count, F, Sum
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 
+from accounts.permissions import parking_admin_required
 from parkings.models import ParkingLot, ParkingSpace, Tariff
 from reservations.models import Reservation
 from .forms import ParkingGridForm, ParkingSpaceEditForm, TariffForm
 
 
-@staff_member_required
+@parking_admin_required
 def dashboard_home(request):
     now = timezone.now()
 
@@ -129,7 +129,7 @@ def get_row_label(index):
     return chr(ord('A') + index)
 
 
-@staff_member_required
+@parking_admin_required
 def create_parking_grid(request):
     if request.method == 'POST':
         form = ParkingGridForm(request.POST)
@@ -191,7 +191,7 @@ def create_parking_grid(request):
         'form': form,
     })
 
-@staff_member_required
+@parking_admin_required
 def dashboard_parking_list(request):
     parkings = (
         ParkingLot.objects
@@ -204,7 +204,7 @@ def dashboard_parking_list(request):
     })
 
 
-@staff_member_required
+@parking_admin_required
 def dashboard_parking_spaces(request, parking_id):
     parking = get_object_or_404(ParkingLot, id=parking_id)
 
@@ -233,7 +233,7 @@ def dashboard_parking_spaces(request, parking_id):
     })
 
 
-@staff_member_required
+@parking_admin_required
 def dashboard_space_edit(request, space_id):
     space = get_object_or_404(
         ParkingSpace.objects.select_related('parking_lot', 'space_type'),
@@ -257,7 +257,7 @@ def dashboard_space_edit(request, space_id):
     })
 
 
-@staff_member_required
+@parking_admin_required
 def dashboard_tariff_list(request):
     tariffs = (
         Tariff.objects
@@ -270,7 +270,7 @@ def dashboard_tariff_list(request):
     })
 
 
-@staff_member_required
+@parking_admin_required
 def dashboard_tariff_add(request):
     if request.method == 'POST':
         form = TariffForm(request.POST)
@@ -290,7 +290,7 @@ def dashboard_tariff_add(request):
     })
 
 
-@staff_member_required
+@parking_admin_required
 def dashboard_tariff_edit(request, tariff_id):
     tariff = get_object_or_404(
         Tariff.objects.select_related('parking_lot', 'space_type'),

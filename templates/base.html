@@ -28,9 +28,12 @@
     <a class="nav-link" href="{% url 'parkings:global_search' %}">Пошук місця</a>
 
     {% if user.is_authenticated %}
-        {% if user.is_staff %}
+        {% if is_parking_admin %}
             <a class="nav-link" href="{% url 'dashboard:home' %}">Dashboard</a>
             <a class="nav-link" href="{% url 'reports:home' %}">Звіти</a>
+        {% endif %}
+
+        {% if can_access_gate %}
             <a class="nav-link" href="{% url 'access_control:home' %}">Контроль пропуску</a>
             <a class="nav-link" href="{% url 'access_control:logs' %}">Журнал доступу</a>
         {% endif %}

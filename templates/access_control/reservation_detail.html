@@ -199,6 +199,7 @@
                             </table>
                         </div>
 
+                        {% if can_mark_payment %}
                         <div class="d-flex flex-wrap gap-2 mt-3 access-detail-actions">
                             {% if not reservation.is_paid %}
                                 <form method="post" action="{% url 'access_control:mark_paid' reservation.access_token %}">
@@ -218,6 +219,7 @@
                                 </form>
                             {% endif %}
                         </div>
+                        {% endif %}
                     </div>
                 </div>
 

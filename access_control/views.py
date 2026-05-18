@@ -1,9 +1,9 @@
 from django.contrib import messages
-from django.contrib.admin.views.decorators import staff_member_required
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 
+from accounts.permissions import gate_access_required, payment_admin_required
 from reservations.models import Reservation
 from .forms import AccessCodeForm, AccessLogFilterForm
 from .models import AccessLog
@@ -22,7 +22,7 @@ def create_access_log(reservation, access_token, action, result, message, user):
     )
 
 
-@staff_member_required
+@gate_access_required
 def access_control_home(request):
     form = AccessCodeForm(request.POST or None)
 
@@ -35,7 +35,7 @@ def access_control_home(request):
     })
 
 
-@staff_member_required
+@gate_access_required
 def access_logs(request):
     filter_form = AccessLogFilterForm(request.GET or None)
 
@@ -97,7 +97,7 @@ def access_logs(request):
     })
 
 
-@staff_member_required
+@gate_access_required
 def reservation_detail(request, access_token):
     reservation = (
         Reservation.objects
@@ -187,7 +187,7 @@ def reservation_detail(request, access_token):
     })
 
 
-@staff_member_required
+@gate_access_required
 def check_in(request, access_token):
     reservation = (
         Reservation.objects
@@ -268,7 +268,7 @@ def check_in(request, access_token):
     return redirect('access_control:reservation_detail', access_token=access_token)
 
 
-@staff_member_required
+@gate_access_required
 def check_out(request, access_token):
     reservation = (
         Reservation.objects
@@ -348,7 +348,7 @@ def check_out(request, access_token):
     return redirect('access_control:reservation_detail', access_token=access_token)
 
 
-@staff_member_required
+@payment_admin_required
 def mark_paid(request, access_token):
     reservation = get_object_or_404(Reservation, access_token=access_token)
 
@@ -366,7 +366,7 @@ def mark_paid(request, access_token):
     return redirect('access_control:reservation_detail', access_token=access_token)
 
 
-@staff_member_required
+@payment_admin_required
 def mark_overtime_paid(request, access_token):
     reservation = get_object_or_404(Reservation, access_token=access_token)
 

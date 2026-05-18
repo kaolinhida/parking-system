@@ -1,12 +1,12 @@
 import csv
 from decimal import Decimal
 
-from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import F, Sum
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.utils import timezone
 
+from accounts.permissions import parking_admin_required
 from reservations.models import Reservation
 from .forms import ReportFilterForm
 
@@ -87,7 +87,7 @@ def prepare_report_reservation_display(reservations, now):
     return live_overtime_sum, live_overtime_count
 
 
-@staff_member_required
+@parking_admin_required
 def reports_home(request):
     now = timezone.now()
     complete_expired_active_reservations(now)
@@ -150,7 +150,7 @@ def reports_home(request):
     })
 
 
-@staff_member_required
+@parking_admin_required
 def reports_export_csv(request):
     now = timezone.now()
     complete_expired_active_reservations(now)
