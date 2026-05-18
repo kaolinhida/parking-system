@@ -16,6 +16,7 @@ class SmokePageTests(TestCase):
     def test_public_pages_open(self):
         urls = [
             reverse('core:home'),
+            reverse('core:about'),
             reverse('parkings:parking_list'),
             reverse('parkings:global_search'),
             reverse('accounts:login'),
@@ -77,6 +78,7 @@ class StaffRoleAccessTests(TestCase):
             reverse('dashboard:home'),
             reverse('reports:home'),
             reverse('access_control:home'),
+            reverse('access_control:logs'),
         ]
 
         for url in urls:
