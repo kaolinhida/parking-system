@@ -5,20 +5,22 @@
 {% block content %}
 <section class="py-5">
     <div class="container">
-        <div class="mb-4">
+        <div class="page-header">
+            <div>
             <a href="{% url 'accounts:profile' %}" class="text-decoration-none">
                 ← Назад до кабінету
             </a>
 
-            <h1 class="fw-bold mt-3">QR-код бронювання</h1>
-            <p class="text-muted mb-0">
+            <h1 class="page-title mt-3">QR-код бронювання</h1>
+            <p class="page-subtitle">
                 Покажіть цей QR-код на умовному сканері шлагбаума.
             </p>
+            </div>
         </div>
 
         <div class="row g-4">
             <div class="col-lg-5">
-                <div class="card border-0 shadow-sm text-center">
+                <div class="card border-0 shadow-sm text-center section-card">
                     <div class="card-body p-4">
                         <img src="{% url 'reservations:reservation_qr_image' reservation.id %}"
                              alt="QR-код бронювання"
@@ -33,11 +35,12 @@
             </div>
 
             <div class="col-lg-7">
-                <div class="card border-0 shadow-sm">
+                <div class="card border-0 shadow-sm section-card">
                     <div class="card-body p-4">
-                        <h5 class="fw-bold mb-3">Дані бронювання</h5>
+                        <h5 class="section-card-title">Дані бронювання</h5>
 
-                        <table class="table">
+                        <div class="table-responsive">
+                        <table class="table modern-table">
                             <tbody>
                                 <tr>
                                     <th>Парковка</th>
@@ -85,6 +88,7 @@
                                 </tr>
                             </tbody>
                         </table>
+                        </div>
 
                         <div class="alert alert-info mb-0">
                             QR-код можна використати для одного в’їзду та одного виїзду.

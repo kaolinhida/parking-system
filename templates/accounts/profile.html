@@ -5,14 +5,16 @@
 {% block content %}
 <section class="py-5">
     <div class="container">
-        <div class="mb-4">
-            <h1 class="fw-bold">Мій кабінет</h1>
-            <p class="text-muted mb-0">
+        <div class="page-header">
+            <div>
+            <h1 class="page-title">Мій кабінет</h1>
+            <p class="page-subtitle">
                 Тут відображається інформація про користувача та його бронювання.
             </p>
+            </div>
         </div>
 
-        <div class="card border-0 shadow-sm mb-4">
+        <div class="card border-0 shadow-sm section-card mb-4">
             <div class="card-body">
                 <h2 class="h5 fw-bold mb-3">Важливі повідомлення</h2>
 
@@ -29,7 +31,7 @@
 
         <div class="row g-4 mb-5">
             <div class="col-lg-4">
-                <div class="card border-0 shadow-sm h-100">
+                <div class="card border-0 shadow-sm h-100 section-card">
                     <div class="card-body">
                         <h5 class="fw-bold mb-3">Дані користувача</h5>
 
@@ -52,7 +54,7 @@
             <div class="col-lg-8">
                 <div class="row g-3">
                     <div class="col-sm-6 col-xl-3">
-                        <div class="card border-0 shadow-sm h-100">
+                        <div class="card border-0 shadow-sm h-100 stat-card">
                             <div class="card-body text-center">
                                 <div class="h2 fw-bold text-primary">{{ active_count }}</div>
                                 <div class="text-muted">Активні</div>
@@ -61,7 +63,7 @@
                     </div>
 
                     <div class="col-sm-6 col-xl-3">
-                        <div class="card border-0 shadow-sm h-100">
+                        <div class="card border-0 shadow-sm h-100 stat-card">
                             <div class="card-body text-center">
                                 <div class="h2 fw-bold text-info">{{ checked_in_count }}</div>
                                 <div class="text-muted">На парковці</div>
@@ -70,7 +72,7 @@
                     </div>
 
                     <div class="col-sm-6 col-xl-3">
-                        <div class="card border-0 shadow-sm h-100">
+                        <div class="card border-0 shadow-sm h-100 stat-card">
                             <div class="card-body text-center">
                                 <div class="h2 fw-bold text-success">{{ completed_count }}</div>
                                 <div class="text-muted">Завершені</div>
@@ -79,7 +81,7 @@
                     </div>
 
                     <div class="col-sm-6 col-xl-3">
-                        <div class="card border-0 shadow-sm h-100">
+                        <div class="card border-0 shadow-sm h-100 stat-card">
                             <div class="card-body text-center">
                                 <div class="h2 fw-bold text-danger">{{ cancelled_count }}</div>
                                 <div class="text-muted">Скасовані</div>
@@ -99,9 +101,9 @@
         </div>
 
         {% if reservations %}
-            <div class="card border-0 shadow-sm">
+            <div class="card border-0 shadow-sm section-card">
                 <div class="table-responsive">
-                    <table class="table align-middle mb-0 text-nowrap">
+                    <table class="table align-middle mb-0 text-nowrap modern-table">
                         <thead class="table-light">
                             <tr>
                                 <th>Парковка</th>
@@ -222,7 +224,7 @@
                 </div>
             </div>
         {% else %}
-            <div class="alert alert-info">
+            <div class="empty-state">
                 У вас ще немає бронювань.
             </div>
         {% endif %}

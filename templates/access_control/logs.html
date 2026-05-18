@@ -5,21 +5,23 @@
 {% block content %}
 <section class="py-5">
     <div class="container">
-        <div class="mb-4">
+        <div class="page-header">
+            <div>
             <a href="{% url 'dashboard:home' %}" class="text-decoration-none">
                 ← Назад до Dashboard
             </a>
 
-            <h1 class="fw-bold mt-3">Журнал доступу</h1>
+            <h1 class="page-title mt-3">Журнал доступу</h1>
 
-            <p class="text-muted mb-0">
+            <p class="page-subtitle">
                 Історія перевірок QR-кодів, підтверджень в’їзду та виїзду.
             </p>
+            </div>
         </div>
 
-        <div class="card border-0 shadow-sm mb-4">
+        <div class="card border-0 shadow-sm section-card mb-4">
             <div class="card-body">
-                <h5 class="fw-bold mb-3">Фільтри журналу</h5>
+                <h5 class="section-card-title">Фільтри журналу</h5>
 
                 <form method="get" class="row g-3">
                     <div class="col-md-3">
@@ -66,7 +68,7 @@
         </div>
 
         {% if logs %}
-            <div class="card border-0 shadow-sm">
+            <div class="card border-0 shadow-sm section-card">
                 <div class="card-body border-bottom">
                     <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                         <h5 class="fw-bold mb-0">Записи журналу</h5>
@@ -78,7 +80,7 @@
                 </div>
 
                 <div class="table-responsive">
-                    <table class="table align-middle mb-0 text-nowrap">
+                    <table class="table align-middle mb-0 text-nowrap modern-table">
                         <thead class="table-light">
                             <tr>
                                 <th>Дата і час</th>
@@ -205,7 +207,7 @@
                 </nav>
             {% endif %}
         {% else %}
-            <div class="alert alert-info">
+            <div class="empty-state">
                 За вибраними фільтрами записи журналу не знайдено.
             </div>
         {% endif %}

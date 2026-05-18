@@ -5,24 +5,26 @@
 {% block content %}
 <section class="py-5">
     <div class="container">
-        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+        <div class="page-header">
             <div>
-                <h1 class="fw-bold mb-1">Мій гараж</h1>
-                <p class="text-muted mb-0">
+                <h1 class="page-title">Мій гараж</h1>
+                <p class="page-subtitle">
                     Тут зберігаються автомобілі, які можна використовувати під час бронювання.
                 </p>
             </div>
 
-            <a href="{% url 'vehicles:vehicle_add' %}" class="btn btn-primary">
-                Додати авто
-            </a>
+            <div class="page-actions">
+                <a href="{% url 'vehicles:vehicle_add' %}" class="btn btn-primary">
+                    Додати авто
+                </a>
+            </div>
         </div>
 
         {% if vehicles %}
             <div class="row g-4">
                 {% for vehicle in vehicles %}
                     <div class="col-md-6 col-lg-4">
-                        <div class="card h-100 border-0 shadow-sm entity-card">
+                        <div class="card h-100 border-0 shadow-sm entity-card section-card">
                             {% if vehicle.photo %}
                                 <img src="{{ vehicle.photo.url }}"
                                      class="card-img-top vehicle-photo"
@@ -72,7 +74,7 @@
                 {% endfor %}
             </div>
         {% else %}
-            <div class="alert alert-info">
+            <div class="empty-state">
                 У вас ще немає доданих автомобілів.
                 <a href="{% url 'vehicles:vehicle_add' %}" class="alert-link">
                     Додати перший автомобіль

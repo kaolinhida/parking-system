@@ -10,14 +10,15 @@
 {% block content %}
 <section class="py-5">
     <div class="container">
-        <div class="mb-4">
+        <div class="page-header">
+            <div>
             <a href="{% url 'parkings:parking_list' %}" class="text-decoration-none">
                 ← Назад до списку парковок
             </a>
 
-            <h1 class="fw-bold mt-3">{{ parking.name }}</h1>
+            <h1 class="page-title mt-3">{{ parking.name }}</h1>
 
-            <p class="text-muted mb-1">
+            <p class="page-subtitle">
                 {{ parking.address }}
             </p>
 
@@ -26,21 +27,24 @@
                     {{ parking.description }}
                 </p>
             {% endif %}
+            </div>
 
             {% if parking.has_coordinates %}
-    <div class="mb-4 d-flex flex-wrap gap-2 stacked-actions">
+    <div class="page-actions">
         <a href="{{ parking.google_maps_url }}" target="_blank" class="btn btn-outline-success">
             Відкрити розташування в Google Maps
         </a>
     </div>
+        </div>
 
-    <div class="card border-0 shadow-sm mb-4">
+    <div class="card border-0 shadow-sm section-card mb-4">
         <div class="card-body">
-            <h5 class="fw-bold mb-3">Розташування парковки</h5>
+            <h5 class="section-card-title">Розташування парковки</h5>
             <div id="parking-map"></div>
         </div>
     </div>
 {% else %}
+        </div>
     <div class="alert alert-warning">
         Для цієї парковки ще не вказано координати.
     </div>
@@ -57,11 +61,10 @@
                     Поточний стан місць станом на {{ now|date:"d.m.Y H:i" }}
                 </p>
             {% endif %}
-        </div>
 
-        <div class="card border-0 shadow-sm mb-4">
+        <div class="card border-0 shadow-sm section-card mb-4">
             <div class="card-body">
-                <h5 class="fw-bold mb-3">Пошук доступних місць</h5>
+                <h5 class="section-card-title">Пошук доступних місць</h5>
 
                 <form method="get" class="row g-3">
                     <div class="col-md-3">
@@ -186,7 +189,7 @@
                 {% endfor %}
             </div>
         {% else %}
-            <div class="alert alert-info">
+            <div class="empty-state">
                 Для вибраних параметрів немає паркомісць.
             </div>
         {% endif %}

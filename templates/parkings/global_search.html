@@ -5,17 +5,19 @@
 {% block content %}
 <section class="py-5">
     <div class="container">
-        <div class="mb-4">
-            <h1 class="fw-bold">Пошук доступного паркомісця</h1>
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">Пошук доступного паркомісця</h1>
 
-            <p class="text-muted mb-0">
-                Вкажіть дату, час і тип місця, щоб знайти доступні паркомісця по всіх парковках.
-            </p>
+                <p class="page-subtitle">
+                    Вкажіть дату, час і тип місця, щоб знайти доступні паркомісця по всіх парковках.
+                </p>
+            </div>
         </div>
 
-        <div class="card border-0 shadow-sm mb-5">
+        <div class="card border-0 shadow-sm section-card mb-5">
             <div class="card-body p-4">
-                <h5 class="fw-bold mb-3">Параметри пошуку</h5>
+                <h5 class="section-card-title">Параметри пошуку</h5>
 
                 <form method="get" class="row g-3">
                     {% if form.non_field_errors %}
@@ -75,7 +77,7 @@
                 <div class="row g-4">
                     {% for item in results %}
                         <div class="col-12">
-                            <div class="card border-0 shadow-sm">
+                            <div class="card border-0 shadow-sm section-card">
                                 <div class="card-body p-4">
                                     <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-3">
                                         <div>
@@ -156,12 +158,12 @@
                     {% endfor %}
                 </div>
             {% else %}
-                <div class="alert alert-info">
+                <div class="empty-state">
                     За вибраними параметрами результатів не знайдено.
                 </div>
             {% endif %}
         {% else %}
-            <div class="alert alert-info">
+            <div class="empty-state">
                 Введіть параметри пошуку, щоб побачити доступні місця по всіх парковках.
             </div>
         {% endif %}

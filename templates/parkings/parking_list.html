@@ -5,24 +5,26 @@
 {% block content %}
 <section class="py-5">
     <div class="container">
-        <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+        <div class="page-header">
             <div>
-                <h1 class="fw-bold mb-1">Доступні парковки</h1>
-                <p class="text-muted mb-0">
+                <h1 class="page-title">Доступні парковки</h1>
+                <p class="page-subtitle">
                     Оберіть парковку або скористайтеся пошуком доступного місця.
                 </p>
             </div>
 
-            <a href="{% url 'parkings:global_search' %}" class="btn btn-primary">
-                Знайти місце
-            </a>
+            <div class="page-actions">
+                <a href="{% url 'parkings:global_search' %}" class="btn btn-primary">
+                    Знайти місце
+                </a>
+            </div>
         </div>
 
         {% if parkings %}
             <div class="row g-4">
                 {% for parking in parkings %}
                     <div class="col-md-6 col-lg-4">
-                        <div class="card border-0 shadow-sm h-100 entity-card">
+                        <div class="card border-0 shadow-sm h-100 entity-card section-card">
                             <div class="card-body p-4">
                                 <h5 class="fw-bold mb-3">{{ parking.name }}</h5>
 
@@ -62,7 +64,7 @@
                 {% endfor %}
             </div>
         {% else %}
-            <div class="alert alert-info">
+            <div class="empty-state">
                 Наразі немає доступних парковок.
             </div>
         {% endif %}

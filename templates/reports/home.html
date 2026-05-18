@@ -5,19 +5,21 @@
 {% block content %}
 <section class="py-5">
     <div class="container">
-        <div class="mb-4">
-            <h1 class="fw-bold">Звіти</h1>
-            <p class="text-muted mb-0">
+        <div class="page-header">
+            <div>
+            <h1 class="page-title">Звіти</h1>
+            <p class="page-subtitle">
                 Аналітична інформація про бронювання, статуси та фінансові показники.
             </p>
             <p class="small text-muted mt-2 mb-0">
                 Оновлено: {{ now|date:"d.m.Y H:i" }}
             </p>
+            </div>
         </div>
 
-        <div class="card border-0 shadow-sm mb-4">
+        <div class="card border-0 shadow-sm section-card mb-4">
             <div class="card-body">
-                <h5 class="fw-bold mb-3">Фільтри звіту</h5>
+                <h5 class="section-card-title">Фільтри звіту</h5>
 
                 <form method="get" class="row g-3">
                     <div class="col-md-3">
@@ -67,7 +69,7 @@
 
         <div class="row g-4 mb-4">
             <div class="col-sm-6 col-xl-3">
-                <div class="card border-0 shadow-sm h-100">
+                <div class="card border-0 shadow-sm h-100 stat-card">
                     <div class="card-body text-center">
                         <div class="h2 fw-bold">{{ total_count }}</div>
                         <div class="text-muted">Усього бронювань</div>
@@ -76,7 +78,7 @@
             </div>
 
             <div class="col-sm-6 col-xl-3">
-                <div class="card border-0 shadow-sm h-100">
+                <div class="card border-0 shadow-sm h-100 stat-card">
                     <div class="card-body text-center">
                         <div class="h2 fw-bold text-primary">{{ active_count }}</div>
                         <div class="text-muted">Активні</div>
@@ -85,7 +87,7 @@
             </div>
 
             <div class="col-sm-6 col-xl-3">
-                <div class="card border-0 shadow-sm h-100">
+                <div class="card border-0 shadow-sm h-100 stat-card">
                     <div class="card-body text-center">
                         <div class="h2 fw-bold text-info">{{ checked_in_count }}</div>
                         <div class="text-muted">Авто на парковці</div>
@@ -94,7 +96,7 @@
             </div>
 
             <div class="col-sm-6 col-xl-3">
-                <div class="card border-0 shadow-sm h-100">
+                <div class="card border-0 shadow-sm h-100 stat-card">
                     <div class="card-body text-center">
                         <div class="h2 fw-bold text-success">{{ completed_count }}</div>
                         <div class="text-muted">Завершені</div>
@@ -105,7 +107,7 @@
 
         <div class="row g-4 mb-5">
             <div class="col-sm-6 col-xl-3">
-                <div class="card border-0 shadow-sm h-100">
+                <div class="card border-0 shadow-sm h-100 stat-card">
                     <div class="card-body text-center">
                         <div class="h2 fw-bold text-danger">{{ cancelled_count }}</div>
                         <div class="text-muted">Скасовані</div>
@@ -114,7 +116,7 @@
             </div>
 
             <div class="col-sm-6 col-xl-3">
-                <div class="card border-0 shadow-sm h-100">
+                <div class="card border-0 shadow-sm h-100 stat-card">
                     <div class="card-body">
                         <div class="text-muted">Базова сума</div>
                         <div class="h4 fw-bold mb-0">{{ total_base_sum }} грн</div>
@@ -123,7 +125,7 @@
             </div>
 
             <div class="col-sm-6 col-xl-3">
-                <div class="card border-0 shadow-sm h-100">
+                <div class="card border-0 shadow-sm h-100 stat-card">
                     <div class="card-body">
                         <div class="text-muted">Доплати / борги</div>
                         <div class="h4 fw-bold mb-0 {% if total_overtime_sum %}text-danger{% endif %}">
@@ -140,7 +142,7 @@
             </div>
 
             <div class="col-sm-6 col-xl-3">
-                <div class="card border-0 shadow-sm h-100">
+                <div class="card border-0 shadow-sm h-100 stat-card">
                     <div class="card-body">
                         <div class="text-muted">Фінальна сума</div>
                         <div class="h4 fw-bold mb-0">{{ final_sum }} грн</div>
@@ -149,13 +151,13 @@
             </div>
         </div>
 
-        <div class="card border-0 shadow-sm">
+        <div class="card border-0 shadow-sm section-card">
             <div class="card-body">
-                <h5 class="fw-bold mb-3">Деталізація бронювань</h5>
+                <h5 class="section-card-title">Деталізація бронювань</h5>
 
                 {% if reservations %}
                     <div class="table-responsive">
-                        <table class="table align-middle mb-0 text-nowrap">
+                        <table class="table align-middle mb-0 text-nowrap modern-table">
                             <thead class="table-light">
                                 <tr>
                                     <th>Користувач</th>
@@ -247,7 +249,7 @@
                         </table>
                     </div>
                 {% else %}
-                    <div class="alert alert-info mb-0">
+                    <div class="empty-state">
                         За вибраними параметрами бронювань не знайдено.
                     </div>
                 {% endif %}

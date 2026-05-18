@@ -28,23 +28,25 @@
 {% block content %}
 <section class="py-5">
     <div class="container">
-        <div class="mb-4">
+        <div class="page-header">
+            <div>
             <a href="{% url 'access_control:home' %}" class="text-decoration-none">
                 ← Назад до контролю доступу
             </a>
 
-            <h1 class="fw-bold mt-3">Перевірка доступу</h1>
-            <p class="text-muted mb-0">
+            <h1 class="page-title mt-3">Перевірка доступу</h1>
+            <p class="page-subtitle">
                 Поточний час: {{ now|date:"d.m.Y H:i" }}
             </p>
+            </div>
         </div>
 
-        <div class="card border-0 shadow-sm mb-4">
+        <div class="card border-0 shadow-sm section-card mb-4">
             <div class="card-body p-4 access-detail-card">
-                <h5 class="fw-bold mb-3">Дані бронювання</h5>
+                <h5 class="section-card-title">Дані бронювання</h5>
 
                 <div class="table-responsive">
-                    <table class="table access-detail-table mb-0">
+                    <table class="table access-detail-table mb-0 modern-table">
                         <tbody>
                             <tr>
                                 <th>Користувач</th>
@@ -130,12 +132,12 @@
                     </table>
                 </div>
 
-                <div class="card border-0 shadow-sm mt-4">
+                <div class="card border-0 shadow-sm section-card mt-4">
                     <div class="card-body">
-                        <h5 class="fw-bold mb-3">Оплата</h5>
+                        <h5 class="section-card-title">Оплата</h5>
 
                         <div class="table-responsive">
-                            <table class="table mb-0">
+                            <table class="table mb-0 modern-table">
                                 <tbody>
                                     <tr>
                                         <th>Базова вартість</th>

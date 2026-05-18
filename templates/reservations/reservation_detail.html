@@ -5,26 +5,28 @@
 {% block content %}
 <section class="py-5">
     <div class="container">
-        <div class="mb-4">
+        <div class="page-header">
+            <div>
             <a href="{% url 'accounts:profile' %}" class="text-decoration-none">
                 ← Назад до кабінету
             </a>
 
-            <h1 class="fw-bold mt-3">Деталі бронювання</h1>
+            <h1 class="page-title mt-3">Деталі бронювання</h1>
 
-            <p class="text-muted mb-0">
+            <p class="page-subtitle">
                 Повна інформація про вибране бронювання.
             </p>
+            </div>
         </div>
 
         <div class="row g-4">
             <div class="col-lg-8">
-                <div class="card border-0 shadow-sm">
+                <div class="card border-0 shadow-sm section-card">
                     <div class="card-body p-4">
-                        <h5 class="fw-bold mb-3">Основна інформація</h5>
+                        <h5 class="section-card-title">Основна інформація</h5>
 
                         <div class="table-responsive">
-                            <table class="table">
+                            <table class="table modern-table">
                                 <tbody>
                                     <tr>
                                         <th>Парковка</th>
@@ -112,7 +114,7 @@
                         <h5 class="fw-bold mt-4 mb-3">Фінансова інформація</h5>
 
                         <div class="table-responsive">
-                            <table class="table">
+                            <table class="table modern-table">
                                 <tbody>
                                     <tr>
                                         <th>Тариф</th>
@@ -211,9 +213,9 @@
             </div>
 
             <div class="col-lg-4">
-                <div class="card border-0 shadow-sm mb-4">
+                <div class="card border-0 shadow-sm action-card mb-4">
                     <div class="card-body p-4">
-                        <h5 class="fw-bold mb-3">Дії</h5>
+                        <h5 class="section-card-title">Дії</h5>
 
                         <div class="d-grid gap-2">
                             <a href="{% url 'reservations:reservation_qr_page' reservation.id %}" class="btn btn-outline-primary">
@@ -232,9 +234,9 @@
                     </div>
                 </div>
 
-                <div class="card border-0 shadow-sm">
+                <div class="card border-0 shadow-sm section-card">
                     <div class="card-body p-4">
-                        <h5 class="fw-bold mb-3">Примітка</h5>
+                        <h5 class="section-card-title">Примітка</h5>
 
                         <p class="text-muted mb-0">
                             QR-код використовується для контролю доступу до парковки.
